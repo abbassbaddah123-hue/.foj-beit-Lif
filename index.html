@@ -1,1 +1,135 @@
+<!DOCTYPE html>
 
+<html lang="ar" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>إدارة فوج بيت ليف</title>
+
+<style>
+
+*{box-sizing:border-box}
+
+body{margin:0;font-family:Arial,sans-serif;background:#f3f6f3;color:#203b2d}
+
+header{background:#174c35;color:white;padding:25px 18px;text-align:center}
+
+header h1{margin:0 0 8px}
+
+main{padding:18px;max-width:850px;margin:auto}
+
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+
+.card{background:white;padding:18px;border-radius:14px;box-shadow:0 2px 8px #0001;margin-bottom:12px}
+
+.stat{text-align:center}
+
+.stat strong{display:block;font-size:27px;color:#b38a38;margin-top:8px}
+
+h2{font-size:19px}
+
+button{border:0;background:#174c35;color:white;padding:13px;border-radius:9px;width:100%;font-size:15px;margin-top:8px}
+
+button.secondary{background:#b38a38}
+
+nav{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+footer{text-align:center;padding:25px;color:#777;font-size:13px}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h1>فوج بيت ليف</h1>
+
+<p>نظام إدارة الأنشطة والحضور</p>
+
+</header>
+
+<main>
+
+<div class="stats">
+
+<div class="card stat">الفرق<strong>6</strong></div>
+
+<div class="card stat">الأنشطة<strong>0</strong></div>
+
+<div class="card stat">العناصر<strong>0</strong></div>
+
+<div class="card stat">الورش<strong>0</strong></div>
+
+</div>
+
+<div class="card">
+
+<h2>الأقسام الرئيسية</h2>
+
+<nav>
+
+<button onclick="show('teams')">الفرق الكشفية</button>
+
+<button onclick="show('activities')">الأنشطة</button>
+
+<button onclick="show('workshops')">الورش الفوجية</button>
+
+<button onclick="show('attendance')">الحضور والغياب</button>
+
+<button onclick="show('leaders')">القادة والصلاحيات</button>
+
+<button onclick="show('settings')">الإعدادات</button>
+
+</nav>
+
+</div>
+
+<div class="card" id="content">
+
+<h2>أهلاً بكم في نظام فوج بيت ليف</h2>
+
+<p>من هنا يمكن إدارة الفرق والأنشطة والورش والحضور.</p>
+
+</div>
+
+</main>
+
+<footer>فوج بيت ليف © 2026</footer>
+
+<script>
+
+function show(section){
+
+const names={
+
+teams:"الفرق الكشفية",
+
+activities:"الأنشطة",
+
+workshops:"الورش الفوجية",
+
+attendance:"الحضور والغياب",
+
+leaders:"القادة والصلاحيات",
+
+settings:"الإعدادات"
+
+};
+
+document.getElementById("content").innerHTML=
+
+"<h2>"+names[section]+"</h2><p>سيتم تجهيز هذا القسم وربطه بقاعدة البيانات في الخطوات التالية.</p>";
+
+}
+
+</script>
+
+</body>
+
+</html>
