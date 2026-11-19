@@ -8,37 +8,33 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>إدارة فوج بيت ليف</title>
+<title>فوج بيت ليف</title>
 
 <style>
 
 *{box-sizing:border-box}
 
-body{margin:0;font-family:Arial,sans-serif;background:#f3f6f3;color:#203b2d}
+body{margin:0;font-family:Arial;background:#f1f5f1;color:#203b2d}
 
-header{background:#174c35;color:white;padding:25px 18px;text-align:center}
+header{background:#174c35;color:white;padding:25px;text-align:center}
 
-header h1{margin:0 0 8px}
+main{max-width:500px;margin:35px auto;padding:15px}
 
-main{padding:18px;max-width:850px;margin:auto}
+.card{background:white;padding:22px;border-radius:15px;box-shadow:0 3px 12px #0001}
 
-.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+h2{text-align:center}
 
-.card{background:white;padding:18px;border-radius:14px;box-shadow:0 2px 8px #0001;margin-bottom:12px}
+input,button{width:100%;padding:14px;margin:9px 0;border-radius:9px;font-size:16px}
 
-.stat{text-align:center}
+input{border:1px solid #ccc}
 
-.stat strong{display:block;font-size:27px;color:#b38a38;margin-top:8px}
+button{background:#174c35;color:white;border:0;cursor:pointer}
 
-h2{font-size:19px}
+#message{text-align:center;color:#b33}
 
-button{border:0;background:#174c35;color:white;padding:13px;border-radius:9px;width:100%;font-size:15px;margin-top:8px}
+#dashboard{display:none}
 
-button.secondary{background:#b38a38}
-
-nav{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-
-footer{text-align:center;padding:25px;color:#777;font-size:13px}
+.section{background:#f1f5f1;padding:16px;margin:10px 0;border-radius:10px}
 
 </style>
 
@@ -56,77 +52,133 @@ footer{text-align:center;padding:25px;color:#777;font-size:13px}
 
 <main>
 
-<div class="stats">
+<div class="card" id="login">
 
-<div class="card stat">الفرق<strong>6</strong></div>
+<h2>تسجيل الدخول</h2>
 
-<div class="card stat">الأنشطة<strong>0</strong></div>
+<p>أهلاً بكم في نظام فوج بيت ليف</p>
 
-<div class="card stat">العناصر<strong>0</strong></div>
+<input id="email" type="email" placeholder="البريد الإلكتروني">
 
-<div class="card stat">الورش<strong>0</strong></div>
+<input id="password" type="password" placeholder="كلمة المرور">
 
-</div>
+<button id="loginBtn">دخول</button>
 
-<div class="card">
-
-<h2>الأقسام الرئيسية</h2>
-
-<nav>
-
-<button onclick="show('teams')">الفرق الكشفية</button>
-
-<button onclick="show('activities')">الأنشطة</button>
-
-<button onclick="show('workshops')">الورش الفوجية</button>
-
-<button onclick="show('attendance')">الحضور والغياب</button>
-
-<button onclick="show('leaders')">القادة والصلاحيات</button>
-
-<button onclick="show('settings')">الإعدادات</button>
-
-</nav>
+<p id="message"></p>
 
 </div>
 
-<div class="card" id="content">
+<div class="card" id="dashboard">
 
-<h2>أهلاً بكم في نظام فوج بيت ليف</h2>
+<h2>أهلاً بك في فوج بيت ليف</h2>
 
-<p>من هنا يمكن إدارة الفرق والأنشطة والورش والحضور.</p>
+<p id="welcome"></p>
+
+<div class="section">الفرق الكشفية</div>
+
+<div class="section">الأنشطة والحضور</div>
+
+<div class="section">الورش الفوجية</div>
+
+<div class="section">القادة والصلاحيات</div>
+
+<div class="section">التقارير والإعدادات</div>
+
+<button id="logoutBtn">تسجيل الخروج</button>
 
 </div>
 
 </main>
 
-<footer>فوج بيت ليف © 2026</footer>
+<script type="module">
 
-<script>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
 
-function show(section){
+import {
 
-const names={
+ getAuth,
 
-teams:"الفرق الكشفية",
+ signInWithEmailAndPassword,
 
-activities:"الأنشطة",
+ onAuthStateChanged,
 
-workshops:"الورش الفوجية",
+ signOut
 
-attendance:"الحضور والغياب",
+} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
 
-leaders:"القادة والصلاحيات",
+const firebaseConfig = {
 
-settings:"الإعدادات"
+ apiKey: "AIzaSyC3McwmwHH_JyPX4bdD_K6OZkh0Z2pDeSA",
+
+ authDomain: "fwjbetlif.firebaseapp.com",
+
+ databaseURL: "https://fwjbetlif-default-rtdb.firebaseio.com",
+
+ projectId: "fwjbetlif",
+
+ storageBucket: "fwjbetlif.firebasestorage.app",
+
+ messagingSenderId: "810985450426",
+
+ appId: "1:810985450426:web:2eef73bfc0e70fcbbf8b83",
+
+ measurementId: "G-YKX4RV19QZ"
 
 };
 
-document.getElementById("content").innerHTML=
+const app = initializeApp(firebaseConfig);
 
-"<h2>"+names[section]+"</h2><p>سيتم تجهيز هذا القسم وربطه بقاعدة البيانات في الخطوات التالية.</p>";
+const auth = getAuth(app);
 
-}
+const loginBox = document.getElementById("login");
+
+const dashboard = document.getElementById("dashboard");
+
+const message = document.getElementById("message");
+
+document.getElementById("loginBtn").onclick = async () => {
+
+ const email = document.getElementById("email").value.trim();
+
+ const password = document.getElementById("password").value;
+
+ message.textContent = "";
+
+ try {
+
+   await signInWithEmailAndPassword(auth,email,password);
+
+ } catch(error) {
+
+   message.textContent = "تعذّر تسجيل الدخول. تأكد من البريد وكلمة المرور.";
+
+ }
+
+};
+
+onAuthStateChanged(auth, user => {
+
+ if(user) {
+
+   loginBox.style.display = "none";
+
+   dashboard.style.display = "block";
+
+   document.getElementById("welcome").textContent =
+
+     "تم تسجيل الدخول: " + user.email;
+
+ } else {
+
+   loginBox.style.display = "block";
+
+   dashboard.style.display = "none";
+
+ }
+
+});
+
+document.getElementById("logoutBtn").onclick = () => signOut(auth);
 
 </script>
 
