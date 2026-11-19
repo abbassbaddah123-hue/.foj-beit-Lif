@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 
 <html lang="ar" dir="rtl">
@@ -8,33 +10,41 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>فوج بيت ليف</title>
+<title>إدارة فوج بيت ليف</title>
 
 <style>
 
 *{box-sizing:border-box}
 
-body{margin:0;font-family:Arial;background:#f1f5f1;color:#203b2d}
+body{margin:0;font-family:Arial,sans-serif;background:#f1f5f1;color:#203b2d}
 
-header{background:#174c35;color:white;padding:25px;text-align:center}
+header{background:#174c35;color:white;padding:22px;text-align:center}
 
-main{max-width:500px;margin:35px auto;padding:15px}
+main{max-width:700px;margin:20px auto;padding:14px}
 
-.card{background:white;padding:22px;border-radius:15px;box-shadow:0 3px 12px #0001}
+.card{background:white;padding:18px;border-radius:14px;margin-bottom:14px;box-shadow:0 2px 9px #0001}
 
-h2{text-align:center}
-
-input,button{width:100%;padding:14px;margin:9px 0;border-radius:9px;font-size:16px}
+input,button{width:100%;padding:13px;margin:7px 0;border-radius:9px;font-size:15px}
 
 input{border:1px solid #ccc}
 
-button{background:#174c35;color:white;border:0;cursor:pointer}
+button{border:0;background:#174c35;color:white;cursor:pointer}
 
-#message{text-align:center;color:#b33}
+.secondary{background:#b38a38}
 
-#dashboard{display:none}
+.danger{background:#b83232}
 
-.section{background:#f1f5f1;padding:16px;margin:10px 0;border-radius:10px}
+.team{border:1px solid #e1e8e1;padding:13px;border-radius:10px;margin:10px 0}
+
+.team-actions{display:flex;gap:8px}
+
+.team-actions button{flex:1}
+
+.hidden{display:none}
+
+#message{color:#a33;text-align:center}
+
+.muted{color:#777;font-size:13px}
 
 </style>
 
@@ -52,47 +62,61 @@ button{background:#174c35;color:white;border:0;cursor:pointer}
 
 <main>
 
-<div class="card" id="login">
+<section id="loginBox" class="card">
 
-<h2>تسجيل الدخول</h2>
-
-<p>أهلاً بكم في نظام فوج بيت ليف</p>
+<h2>تسجيل دخول المدير</h2>
 
 <input id="email" type="email" placeholder="البريد الإلكتروني">
 
 <input id="password" type="password" placeholder="كلمة المرور">
 
-<button id="loginBtn">دخول</button>
+<button id="loginBtn">تسجيل الدخول</button>
 
 <p id="message"></p>
 
-</div>
+</section>
 
-<div class="card" id="dashboard">
+<section id="appBox" class="hidden">
 
-<h2>أهلاً بك في فوج بيت ليف</h2>
+<div class="card">
 
-<p id="welcome"></p>
+<h2>لوحة الإدارة</h2>
 
-<div class="section">الفرق الكشفية</div>
+<p>مرحباً بك في نظام فوج بيت ليف</p>
 
-<div class="section">الأنشطة والحضور</div>
-
-<div class="section">الورش الفوجية</div>
-
-<div class="section">القادة والصلاحيات</div>
-
-<div class="section">التقارير والإعدادات</div>
-
-<button id="logoutBtn">تسجيل الخروج</button>
+<button id="logoutBtn" class="danger">تسجيل الخروج</button>
 
 </div>
+
+<div class="card">
+
+<h2>إدارة الفرق الكشفية</h2>
+
+<p class="muted">يمكنك إضافة الفرق وتعديلها وحذفها.</p>
+
+<input id="teamName" placeholder="اكتب اسم الفرقة الجديدة">
+
+<button id="addTeamBtn">+ إضافة فرقة</button>
+
+<p id="teamMessage" class="muted"></p>
+
+</div>
+
+<div class="card">
+
+<h2>الفرق الموجودة</h2>
+
+<div id="teamsList">جاري تحميل الفرق...</div>
+
+</div>
+
+</section>
 
 </main>
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+import {initializeApp} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
 
 import {
 
@@ -106,9 +130,25 @@ import {
 
 } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
 
+import {
+
+ getDatabase,
+
+ ref,
+
+ onValue,
+
+ set,
+
+ update,
+
+ remove
+
+} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-database.js";
+
 const firebaseConfig = {
 
- apiKey: "AIzaSyC3McwmwHH_JyPX4bdD_K6OZkh0Z2pDeSA",
+ apiKey: "AIzaSyC3McwmwHH_JyPX4bdD_KO6Zkh0Z2pDeSA",
 
  authDomain: "fwjbetlif.firebaseapp.com",
 
@@ -126,15 +166,43 @@ const firebaseConfig = {
 
 };
 
+const ADMIN_UID = "kFXfcTCjqqPbWn9hqG4WS8YF1s72";
+
 const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
 
-const loginBox = document.getElementById("login");
+const db = getDatabase(app);
 
-const dashboard = document.getElementById("dashboard");
+const loginBox = document.getElementById("loginBox");
+
+const appBox = document.getElementById("appBox");
 
 const message = document.getElementById("message");
+
+const teamMessage = document.getElementById("teamMessage");
+
+const teamsList = document.getElementById("teamsList");
+
+let stopTeamsListener = null;
+
+let seeding = false;
+
+const defaultTeams = {
+
+ baraem: {name:"براعم"},
+
+ ashbal: {name:"أشبال"},
+
+ kashafa: {name:"كشافة"},
+
+ jawala: {name:"جوالة"},
+
+ community: {name:"الخدمة المجتمعية"},
+
+ leaders: {name:"القادة"}
+
+};
 
 document.getElementById("loginBtn").onclick = async () => {
 
@@ -150,35 +218,231 @@ document.getElementById("loginBtn").onclick = async () => {
 
  } catch(error) {
 
-   message.textContent = "تعذّر تسجيل الدخول. تأكد من البريد وكلمة المرور.";
+   message.textContent = "تعذّر الدخول. تأكد من البريد وكلمة المرور.";
 
  }
 
 };
 
-onAuthStateChanged(auth, user => {
+document.getElementById("logoutBtn").onclick = async () => {
 
- if(user) {
+ await signOut(auth);
 
-   loginBox.style.display = "none";
+};
 
-   dashboard.style.display = "block";
+onAuthStateChanged(auth, async user => {
 
-   document.getElementById("welcome").textContent =
+ if(stopTeamsListener) {
 
-     "تم تسجيل الدخول: " + user.email;
+   stopTeamsListener();
 
- } else {
-
-   loginBox.style.display = "block";
-
-   dashboard.style.display = "none";
+   stopTeamsListener = null;
 
  }
 
+ if(!user) {
+
+   loginBox.classList.remove("hidden");
+
+   appBox.classList.add("hidden");
+
+   return;
+
+ }
+
+ if(user.uid !== ADMIN_UID) {
+
+   await signOut(auth);
+
+   message.textContent = "هذا الحساب ليس حساب المدير.";
+
+   return;
+
+ }
+
+ loginBox.classList.add("hidden");
+
+ appBox.classList.remove("hidden");
+
+ loadTeams();
+
 });
 
-document.getElementById("logoutBtn").onclick = () => signOut(auth);
+function loadTeams() {
+
+ const teamsRef = ref(db,"teams");
+
+ stopTeamsListener = onValue(teamsRef, async snapshot => {
+
+   if(!snapshot.exists() && !seeding) {
+
+     seeding = true;
+
+     try {
+
+       await set(teamsRef,defaultTeams);
+
+     } catch(error) {
+
+       teamMessage.textContent = "تعذّر إنشاء الفرق: " + error.message;
+
+     }
+
+     return;
+
+   }
+
+   const teams = snapshot.val() || {};
+
+   renderTeams(teams);
+
+ }, error => {
+
+   teamMessage.textContent = "خطأ بتحميل الفرق: " + error.message;
+
+ });
+
+}
+
+function renderTeams(teams) {
+
+ teamsList.replaceChildren();
+
+ const entries = Object.entries(teams);
+
+ if(entries.length === 0) {
+
+   teamsList.textContent = "لا توجد فرق حالياً.";
+
+   return;
+
+ }
+
+ entries.forEach(([id,team]) => {
+
+   const card = document.createElement("div");
+
+   card.className = "team";
+
+   const title = document.createElement("h3");
+
+   title.textContent = team.name || "فرقة بدون اسم";
+
+   const actions = document.createElement("div");
+
+   actions.className = "team-actions";
+
+   const edit = document.createElement("button");
+
+   edit.textContent = "تعديل الاسم";
+
+   edit.className = "secondary";
+
+   edit.onclick = async () => {
+
+     const newName = prompt("اكتب الاسم الجديد:",team.name);
+
+     if(!newName || !newName.trim()) return;
+
+     try {
+
+       await update(ref(db,"teams/"+id),{name:newName.trim()});
+
+       teamMessage.textContent = "تم تعديل اسم الفرقة.";
+
+     } catch(error) {
+
+       teamMessage.textContent = "تعذّر التعديل: " + error.message;
+
+     }
+
+   };
+
+   const del = document.createElement("button");
+
+   del.textContent = "حذف";
+
+   del.className = "danger";
+
+   del.onclick = async () => {
+
+     if(!confirm("هل أنت متأكد من حذف هذه الفرقة؟")) return;
+
+     try {
+
+       await remove(ref(db,"teams/"+id));
+
+       teamMessage.textContent = "تم حذف الفرقة.";
+
+     } catch(error) {
+
+       teamMessage.textContent = "تعذّر الحذف: " + error.message;
+
+     }
+
+   };
+
+   actions.append(edit,del);
+
+   card.append(title,actions);
+
+   teamsList.append(card);
+
+ });
+
+}
+
+document.getElementById("addTeamBtn").onclick = async () => {
+
+ const name = document.getElementById("teamName").value.trim();
+
+ if(!name) {
+
+   teamMessage.textContent = "اكتب اسم الفرقة أولاً.";
+
+   return;
+
+ }
+
+ try {
+
+   const snapshot = await new Promise((resolve,reject) => {
+
+     onValue(ref(db,"teams"),resolve,reject,{onlyOnce:true});
+
+   });
+
+   const teams = snapshot.val() || {};
+
+   const duplicate = Object.values(teams).some(
+
+     team => (team.name || "").trim() === name
+
+   );
+
+   if(duplicate) {
+
+     teamMessage.textContent = "هذه الفرقة موجودة مسبقاً.";
+
+     return;
+
+   }
+
+   const id = "team_" + Date.now();
+
+   await set(ref(db,"teams/"+id),{name:name});
+
+   document.getElementById("teamName").value = "";
+
+   teamMessage.textContent = "تمت إضافة الفرقة بنجاح.";
+
+ } catch(error) {
+
+   teamMessage.textContent = "تعذّرت الإضافة: " + error.message;
+
+ }
+
+};
 
 </script>
 
