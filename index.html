@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 
 <html lang="ar" dir="rtl">
@@ -8,99 +10,85 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>فوج بيت ليف</title>
+<title>فوج الإمام الهادي - بيت ليف</title>
 
 <style>
 
-:root {
-
-  --navy:#082b55;
-
-  --blue:#1262ad;
-
-  --light:#eaf4ff;
-
-  --accent:#2786d5;
-
-  --bg:#f3f7fc;
-
-  --white:#fff;
-
-  --text:#19324d;
-
-  --muted:#718096;
-
-  --border:#dce7f2;
-
-}
+:root{--navy:#082b55;--blue:#1262ad;--accent:#2786d5;--light:#eaf4ff;--bg:#f3f7fc;--text:#19324d;--muted:#718096;--border:#dce7f2}
 
 *{box-sizing:border-box}
 
 body{margin:0;background:var(--bg);color:var(--text);font-family:Tahoma,Arial,sans-serif}
 
-header{background:linear-gradient(120deg,var(--navy),var(--blue));color:white;padding:22px 18px}
+header{background:linear-gradient(120deg,var(--navy),var(--blue));color:white;padding:20px 15px}
 
-.header-inner{max-width:1150px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.header-inner{max-width:1100px;margin:auto;display:flex;align-items:center;gap:12px}
 
-.brand{display:flex;align-items:center;gap:12px}
+.logo{width:50px;height:50px;border-radius:14px;background:#ffffff25;display:grid;place-items:center;font-size:27px}
 
-.logo{width:52px;height:52px;border-radius:15px;background:#ffffff25;display:grid;place-items:center;font-size:27px}
+header h1{font-size:19px;margin:0 0 5px}
 
-header h1{font-size:21px;margin:0 0 5px}
+header p{font-size:12px;margin:0;color:#d8eaff}
 
-header p{margin:0;color:#d8eaff;font-size:13px}
+main{max-width:1100px;margin:20px auto;padding:0 13px}
 
-main{max-width:1150px;margin:22px auto;padding:0 14px}
+nav{display:flex;gap:8px;overflow-x:auto;padding:4px 0 14px}
 
-nav{display:flex;gap:8px;overflow-x:auto;padding:5px 0 14px}
+nav button{white-space:nowrap;border:1px solid var(--border);background:white;color:var(--navy);padding:11px 14px;border-radius:11px;font-weight:bold}
 
-nav button{white-space:nowrap;border:1px solid var(--border);background:white;color:var(--navy);padding:11px 15px;border-radius:11px;font-weight:bold;cursor:pointer}
+nav button.active{background:var(--blue);color:white}
 
-nav button.active,nav button:hover{background:var(--blue);color:white;border-color:var(--blue)}
+.panel{background:white;border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:15px;box-shadow:0 3px 14px #163b6010}
 
-.panel{background:white;border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:0 3px 14px #163b6010}
+h2{font-size:18px;color:var(--navy);margin:0 0 15px}
 
-h2{font-size:19px;color:var(--navy);margin:0 0 16px}
+h3{font-size:15px;color:var(--navy)}
 
-h3{font-size:16px;color:var(--navy)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
 
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px}
+.stat{background:var(--light);border-radius:13px;padding:15px}
 
-.stat{background:var(--light);border-radius:13px;padding:17px}
+.stat strong{display:block;font-size:25px;color:var(--blue);margin-bottom:5px}
 
-.stat strong{display:block;font-size:27px;color:var(--blue);margin-bottom:5px}
+.stat span{font-size:12px;color:var(--muted)}
 
-.stat span{font-size:13px;color:var(--muted)}
+.team-card,.group-card{border:1px solid var(--border);border-radius:13px;padding:14px;background:white;margin-bottom:10px}
 
-.team-card{border:1px solid var(--border);border-radius:13px;padding:15px;background:white;cursor:pointer}
+.team-card{cursor:pointer}
 
-.team-card:hover{border-color:var(--accent);background:var(--light)}
+.team-card:active,.group-card:active{border-color:var(--accent)}
 
 .team-card strong{display:block;color:var(--navy);margin-bottom:7px}
 
 .team-card small{color:var(--muted)}
 
-button,.btn{font-family:inherit}
+.group-card{background:#f8fbff}
 
-.action{background:var(--blue);color:white;border:0;border-radius:10px;padding:11px 15px;cursor:pointer;font-weight:bold}
+.group-open{display:block;width:100%;text-align:right;border:0;background:transparent;padding:3px;color:var(--navy);font:inherit;cursor:pointer}
 
-.action:hover{background:var(--navy)}
+.group-open strong{font-size:16px}
 
-.secondary{background:var(--light);color:var(--blue);border:1px solid #cfe3f8;border-radius:10px;padding:10px 13px;cursor:pointer;font-weight:bold}
+.group-open small{display:block;color:var(--muted);margin-top:7px}
 
-.danger{background:#fff0f0;color:#b42318;border:1px solid #ffd3d3;border-radius:9px;padding:8px 11px;cursor:pointer}
+.action,.secondary,.danger{font-family:inherit;cursor:pointer;border-radius:10px;padding:10px 13px;font-weight:bold}
 
-.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0}
+.action{background:var(--blue);color:white;border:0}
+
+.secondary{background:var(--light);color:var(--blue);border:1px solid #cfe3f8}
+
+.danger{background:#fff0f0;color:#b42318;border:1px solid #ffd3d3}
+
+button:disabled{opacity:.45;cursor:not-allowed}
+
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
 
 input,select,textarea{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:white;font:inherit;color:var(--text);margin-top:6px}
 
 label{display:block;font-size:13px;font-weight:bold;color:var(--navy);margin-bottom:12px}
 
-.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+table{width:100%;border-collapse:collapse;min-width:450px}
 
-table{width:100%;border-collapse:collapse;min-width:540px}
-
-th,td{padding:12px 10px;border-bottom:1px solid var(--border);text-align:right;font-size:13px}
+th,td{padding:11px 9px;border-bottom:1px solid var(--border);text-align:right;font-size:13px}
 
 th{background:var(--light);color:var(--navy)}
 
@@ -108,27 +96,21 @@ th{background:var(--light);color:var(--navy)}
 
 .tag{display:inline-block;background:var(--light);color:var(--blue);padding:5px 9px;border-radius:20px;font-size:12px}
 
-.empty{text-align:center;color:var(--muted);padding:25px}
+.empty{text-align:center;color:var(--muted);padding:22px;font-size:13px}
 
 .hidden{display:none!important}
 
-footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
-
-.notice{background:#eef6ff;border:1px solid #cfe3f8;padding:12px;border-radius:10px;font-size:13px;color:#174a7e;margin-bottom:14px}
+.notice{background:#eef6ff;border:1px solid #cfe3f8;padding:12px;border-radius:10px;font-size:13px;color:#174a7e;margin-bottom:13px}
 
 .row-between{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 
-@media(max-width:600px){
+.form-box{background:#f5f9ff;border:1px solid var(--border);padding:14px;border-radius:12px;margin:12px 0}
 
- header h1{font-size:18px}
+.form-box h3{margin-top:0}
 
- main{margin-top:14px}
+footer{text-align:center;color:var(--muted);padding:22px;font-size:12px}
 
- .panel{padding:14px}
-
- .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-
-}
+@media(min-width:700px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
 </style>
 
@@ -140,21 +122,15 @@ footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
 
  <div class="header-inner">
 
-  <div class="brand">
+  <div class="logo">⚜️</div>
 
-   <div class="logo">⚜️</div>
+  <div>
 
-   <div>
+   <h1 id="siteTitle">فوج الإمام الهادي (ع) – بيت ليف</h1>
 
-    <h1 id="siteTitle">فوج الإمام الهادي (ع) – بيت ليف</h1>
-
-    <p>منصة إدارة وتنظيم أنشطة الفوج</p>
-
-   </div>
+   <p>منصة إدارة وتنظيم أنشطة الفوج</p>
 
   </div>
-
-  <span class="tag" style="background:#ffffff25;color:white">الإدارة والتنظيم</span>
 
  </div>
 
@@ -162,7 +138,7 @@ footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
 
 <main>
 
-<nav id="nav">
+<nav>
 
  <button class="active" data-page="home">الرئيسية</button>
 
@@ -180,13 +156,7 @@ footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
 
 <section id="home" class="page">
 
- <div class="panel">
-
-  <h2>أهلاً بكم في منصة الفوج</h2>
-
-  <p>من هنا يمكنك متابعة الفرق والعناصر والورش والأنشطة والحضور.</p>
-
- </div>
+ <div class="panel"><h2>أهلاً بكم في منصة الفوج</h2><p>منصة لتنظيم الفرق والعناصر والورش والأنشطة والحضور.</p></div>
 
  <div class="grid">
 
@@ -200,29 +170,17 @@ footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
 
  </div>
 
- <div class="panel" style="margin-top:16px">
+ <div class="panel" style="margin-top:15px"><h2>الفرق الكشفية</h2><div class="grid" id="homeTeams"></div></div>
 
-  <h2>الفرق الكشفية</h2>
-
-  <div class="grid" id="homeTeams"></div>
-
- </div>
-
- <div class="panel">
-
-  <div class="row-between"><h2>آخر الورش والأنشطة</h2><button class="secondary" onclick="showPage('workshops')">عرض الكل</button></div>
-
-  <div id="recentWorkshops"></div>
-
- </div>
+ <div class="panel"><h2>آخر الورش والأنشطة</h2><div id="recentWorkshops"></div></div>
 
 </section>
 
 <section id="teams" class="page hidden">
 
- <div class="panel">
+ <div class="panel" id="teamsPanel">
 
-  <div class="row-between"><h2>إدارة الفرق</h2><button class="action" onclick="addTeam()">+ إضافة فريق</button></div>
+  <div class="row-between"><h2>الفرق</h2><button class="action" onclick="addTeam()">+ إضافة فرقة</button></div>
 
   <div class="grid" id="teamsList"></div>
 
@@ -230,23 +188,59 @@ footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
 
  <div class="panel hidden" id="teamDetails">
 
-  <div class="row-between"><h2 id="teamDetailsTitle">الفريق</h2><button class="secondary" onclick="closeTeam()">رجوع للفرق</button></div>
+  <button class="secondary back" onclick="closeTeam()">← رجوع إلى الفرق</button>
 
-  <div class="toolbar">
+  <div class="row-between"><h2 id="teamDetailsTitle"></h2><button class="secondary" onclick="renameSelectedTeam()">تعديل اسم الفرقة</button></div>
 
-   <button class="action" onclick="addMemberForTeam()">+ إضافة عنصر للفريق</button>
+  <div id="groupManagement"></div>
 
-   <button class="secondary" onclick="addGroup()">+ إضافة طليعة / رهط</button>
+  <div class="toolbar"><button class="action" onclick="showMemberForm()">+ إضافة عنصر إلى الفرقة</button></div>
+
+  <div id="teamMemberForm" class="form-box hidden"></div>
+
+  <h3>عناصر الفرقة</h3>
+
+  <div id="teamMembers"></div>
+
+  <h3>أنشطة الفرقة</h3>
+
+  <div id="teamWorkshops"></div>
+
+ </div>
+
+</section>
+
+<section id="groupDetails" class="page hidden">
+
+ <div class="panel">
+
+  <button class="secondary back" onclick="backToTeam()">← رجوع إلى الفرقة</button>
+
+  <div class="row-between">
+
+   <h2 id="groupDetailsTitle"></h2>
+
+   <button class="secondary" onclick="renameSelectedGroup()">تعديل الاسم</button>
 
   </div>
 
-  <h3>الطلائع والأرهاط</h3>
+  <div class="notice" id="groupCapacity"></div>
 
-  <div id="teamGroups"></div>
+  <h3>إضافة عنصر إلى هذه المجموعة</h3>
 
-  <h3>عناصر الفريق</h3>
+  <div class="form-box">
 
-  <div id="teamMembers"></div>
+   <label>اسم العنصر<input id="groupMemberName" placeholder="اكتب اسم العنصر"></label>
+
+   <label>رقم الهاتف (اختياري)<input id="groupMemberPhone" placeholder="رقم الهاتف"></label>
+
+   <button class="action" onclick="saveGroupMember()">حفظ العنصر</button>
+
+  </div>
+
+  <h3>عناصر المجموعة</h3>
+
+  <div id="groupMembers"></div>
 
  </div>
 
@@ -256,17 +250,15 @@ footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
 
  <div class="panel">
 
-  <div class="row-between"><h2>إدارة العناصر</h2><button class="action" onclick="addMember()">+ إضافة عنصر</button></div>
+  <div class="row-between"><h2>إدارة العناصر</h2><button class="action" onclick="showGeneralMemberForm()">+ إضافة عنصر</button></div>
 
-  <label>بحث عن عنصر
+  <div id="generalMemberForm" class="form-box hidden"></div>
 
-   <input id="memberSearch" placeholder="اكتب اسم العنصر..." oninput="renderMembers()">
-
-  </label>
+  <label>البحث عن عنصر<input id="memberSearch" placeholder="اكتب اسم العنصر..." oninput="renderMembers()"></label>
 
   <div class="table-wrap" id="membersTable"></div>
 
-  <div class="toolbar"><button class="secondary" onclick="exportMembers()">تصدير العناصر إلى Excel</button></div>
+  <div class="toolbar"><button class="secondary" onclick="exportMembers()">تصدير العناصر</button></div>
 
  </div>
 
@@ -276,9 +268,9 @@ footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
 
  <div class="panel">
 
-  <div class="row-between"><h2>الورش والأنشطة</h2><button class="action" onclick="addWorkshop()">+ إنشاء ورشة / نشاط</button></div>
+  <div class="row-between"><h2>الورش والأنشطة</h2><button class="action" onclick="showWorkshopForm()">+ إنشاء ورشة / نشاط</button></div>
 
-  <p style="color:var(--muted);font-size:13px">أنشئ ورشاً وأنشطة على مدار السنة، وحدد الفريق والتاريخ والمكان.</p>
+  <div id="workshopForm" class="form-box hidden"></div>
 
   <div id="workshopsList"></div>
 
@@ -292,11 +284,7 @@ footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
 
   <h2>تسجيل الحضور</h2>
 
-  <label>اختر الورشة أو النشاط
-
-   <select id="attendanceWorkshop" onchange="renderAttendance()"></select>
-
-  </label>
+  <label>اختر الورشة أو النشاط<select id="attendanceWorkshop" onchange="renderAttendance()"></select></label>
 
   <div id="attendanceArea"></div>
 
@@ -318,23 +306,11 @@ footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
 
   <h2>إعدادات الموقع</h2>
 
-  <label>اسم الفوج
+  <label>اسم الفوج<input id="settingTitle"></label>
 
-   <input id="settingTitle" value="فوج الإمام الهادي (ع) – بيت ليف">
+  <label>اللون الأساسي<input type="color" id="settingBlue" value="#1262ad"></label>
 
-  </label>
-
-  <label>اللون الأساسي
-
-   <input type="color" id="settingBlue" value="#1262ad">
-
-  </label>
-
-  <label>اللون الكحلي
-
-   <input type="color" id="settingNavy" value="#082b55">
-
-  </label>
+  <label>اللون الكحلي<input type="color" id="settingNavy" value="#082b55"></label>
 
   <button class="action" onclick="saveSettings()">حفظ الإعدادات</button>
 
@@ -343,8 +319,6 @@ footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
  <div class="panel">
 
   <h2>النسخ الاحتياطي</h2>
-
-  <p style="font-size:13px;color:var(--muted)">يمكنك تنزيل نسخة من بيانات الموقع للاحتفاظ بها.</p>
 
   <div class="toolbar">
 
@@ -366,51 +340,65 @@ footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
 
 <script>
 
-const defaultTeams = ["براعم","أشبال","كشافة","جوالة","الخدمة المجتمعية","القادة"];
+const defaultTeams=[
 
-function loadData(){
+ {id:"1",name:"فرقة البراعم",type:"none"},
 
- try{
+ {id:"2",name:"فرقة الأشبال",type:"none"},
 
-  return JSON.parse(localStorage.getItem("beitlif_data")) || null;
+ {id:"3",name:"فرقة الكشافة",type:"talaya"},
 
- }catch(e){return null}
+ {id:"4",name:"فرقة الجوالة",type:"arhat"},
 
-}
+ {id:"5",name:"فرقة الخدمة المجتمعية",type:"none"},
 
-let data = loadData() || {
+ {id:"6",name:"فرقة القادة",type:"none"}
 
- teams: defaultTeams.map((name,i)=>({id:i+1,name,groups:[]})),
+];
 
- members: [],
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8)}
 
- workshops: [],
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 
- attendance: [],
+function loadData(){try{return JSON.parse(localStorage.getItem("beitlif_data"))||null}catch(e){return null}}
 
- settings:{title:"فوج الإمام الهادي (ع) – بيت ليف",blue:"#1262ad",navy:"#082b55"}
+let data=loadData()||{teams:defaultTeams.map(t=>({...t,groups:[]})),members:[],workshops:[],attendance:[],settings:{title:"فوج الإمام الهادي (ع) – بيت ليف",blue:"#1262ad",navy:"#082b55"}};
 
-};
+data.teams||=[];
 
-let selectedTeam = null;
+data.members||=[];
 
-let attendanceDraft = {};
+data.workshops||=[];
 
-function saveData(){
+data.attendance||=[];
 
- localStorage.setItem("beitlif_data",JSON.stringify(data));
+data.settings||={title:"فوج الإمام الهادي (ع) – بيت ليف",blue:"#1262ad",navy:"#082b55"};
 
- updateDashboard();
+data.teams.forEach(t=>{
 
-}
+ let d=defaultTeams.find(x=>x.id==t.id);
 
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+ t.type=d?.type||t.type||"none";
 
-function esc(s){
+ t.name=d?.name||t.name;
 
- return String(s ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+ t.groups=(t.groups||[]).map(g=>typeof g==="string"?{id:uid(),name:g}:g);
 
-}
+});
+
+data.members.forEach(m=>{m.groupId||="";});
+
+let selectedTeam=null,selectedGroup=null,attendanceDraft={};
+
+function saveData(){localStorage.setItem("beitlif_data",JSON.stringify(data));updateDashboard()}
+
+function groupWord(t){return t.type==="talaya"?"طليعة":"رهط"}
+
+function groupPlural(t){return t.type==="talaya"?"الطلائع":"الأرهاط"}
+
+function countGroup(id){return data.members.filter(m=>m.groupId===id).length}
+
+function getGroup(id){return selectedTeam?.groups.find(g=>g.id===id)}
 
 function showPage(page){
 
@@ -420,7 +408,7 @@ function showPage(page){
 
  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
 
- if(page==="teams")renderTeams();
+ if(page==="teams"){selectedTeam=null;document.getElementById("teamsPanel").classList.remove("hidden");document.getElementById("teamDetails").classList.add("hidden");renderTeams()}
 
  if(page==="members")renderMembers();
 
@@ -448,183 +436,339 @@ function updateDashboard(){
 
  document.getElementById("siteTitle").textContent=data.settings.title;
 
- document.getElementById("homeTeams").innerHTML=data.teams.map(t=>
+ let cards=data.teams.map(t=>`<div class="team-card" onclick="openTeam('${t.id}')"><strong>${esc(t.name)}</strong><small>${data.members.filter(m=>m.teamId===t.id).length} عنصر</small></div>`).join("");
 
- `<div class="team-card" onclick="openTeam('${t.id}')"><strong>${esc(t.name)}</strong><small>${data.members.filter(m=>m.teamId==t.id).length} عنصر</small></div>`
+ document.getElementById("homeTeams").innerHTML=cards;
 
- ).join("");
-
- document.getElementById("recentWorkshops").innerHTML=data.workshops.length?
-
- data.workshops.slice(-5).reverse().map(w=>`<p>📘 <b>${esc(w.name)}</b> — ${esc(w.date||"من دون تاريخ")} <span class="tag">${esc(w.teamName)}</span></p>`).join("")
-
- :'<div class="empty">لا توجد ورش أو أنشطة بعد.</div>';
+ document.getElementById("recentWorkshops").innerHTML=data.workshops.length?data.workshops.slice(-5).reverse().map(w=>`<p>📘 <b>${esc(w.name)}</b> — ${esc(w.date||"من دون تاريخ")}</p>`).join(""):'<div class="empty">لا توجد ورش أو أنشطة بعد.</div>';
 
 }
 
 function renderTeams(){
 
- document.getElementById("teamsList").innerHTML=data.teams.map(t=>`
-
- <div class="team-card">
-
-  <strong onclick="openTeam('${t.id}')">${esc(t.name)}</strong>
-
-  <small>${data.members.filter(m=>m.teamId==t.id).length} عنصر · ${t.groups.length} طلائع / أرهاط</small>
-
-  <div class="toolbar">
-
-   <button class="secondary" onclick="openTeam('${t.id}')">فتح الفريق</button>
-
-   <button class="secondary" onclick="renameTeam('${t.id}')">تعديل الاسم</button>
-
-  </div>
-
- </div>`).join("");
+ document.getElementById("teamsList").innerHTML=data.teams.map(t=>`<div class="team-card" onclick="openTeam('${t.id}')"><strong>${esc(t.name)}</strong><small>${data.members.filter(m=>m.teamId===t.id).length} عنصر</small></div>`).join("");
 
 }
 
 function addTeam(){
 
- let name=prompt("اسم الفريق الجديد:");
+ let name=prompt("اسم الفرقة الجديدة:");
 
- if(!name || !name.trim())return;
+ if(!name?.trim())return;
 
- data.teams.push({id:uid(),name:name.trim(),groups:[]});
-
- saveData();renderTeams();
-
-}
-
-function renameTeam(id){
-
- let t=data.teams.find(x=>x.id==id);if(!t)return;
-
- let name=prompt("الاسم الجديد:",t.name);
-
- if(name&&name.trim()){t.name=name.trim();saveData();renderTeams();}
+ data.teams.push({id:uid(),name:name.trim(),type:"none",groups:[]});saveData();renderTeams();
 
 }
 
 function openTeam(id){
 
- selectedTeam=data.teams.find(t=>t.id==id);if(!selectedTeam)return;
+ selectedTeam=data.teams.find(t=>t.id===id);if(!selectedTeam)return;
+
+ showPage("teams");selectedTeam=data.teams.find(t=>t.id===id);
+
+ document.getElementById("teamsPanel").classList.add("hidden");
 
  document.getElementById("teamDetails").classList.remove("hidden");
 
- document.getElementById("teamDetailsTitle").textContent=selectedTeam.name;
-
  renderTeamDetails();
-
- document.getElementById("teamDetails").scrollIntoView({behavior:"smooth"});
 
 }
 
-function closeTeam(){selectedTeam=null;document.getElementById("teamDetails").classList.add("hidden")}
+function closeTeam(){selectedTeam=null;document.getElementById("teamDetails").classList.add("hidden");document.getElementById("teamsPanel").classList.remove("hidden");renderTeams()}
+
+function renameSelectedTeam(){
+
+ let n=prompt("اسم الفرقة:",selectedTeam.name);
+
+ if(!n?.trim())return;
+
+ selectedTeam.name=n.trim();
+
+ data.members.filter(m=>m.teamId===selectedTeam.id).forEach(m=>m.teamName=selectedTeam.name);
+
+ data.workshops.filter(w=>w.teamId===selectedTeam.id).forEach(w=>w.teamName=selectedTeam.name);
+
+ saveData();renderTeamDetails();
+
+}
 
 function renderTeamDetails(){
 
  if(!selectedTeam)return;
 
- document.getElementById("teamGroups").innerHTML=selectedTeam.groups.length?
+ document.getElementById("teamDetailsTitle").textContent=selectedTeam.name;
 
- selectedTeam.groups.map(g=>`<span class="tag" style="margin:4px">${esc(g)}</span>`).join("")
+ renderGroups();
 
- :'<p class="empty">لم تتم إضافة طلائع أو أرهاط.</p>';
+ let ms=data.members.filter(m=>m.teamId===selectedTeam.id);
 
- let ms=data.members.filter(m=>m.teamId==selectedTeam.id);
+ document.getElementById("teamMembers").innerHTML=ms.length?`<div class="table-wrap"><table><tr><th>الاسم</th><th>الطليعة / الرهط</th><th>الهاتف</th><th>إجراء</th></tr>${ms.map(m=>{let g=selectedTeam.groups.find(x=>x.id===m.groupId);return `<tr><td>${esc(m.name)}</td><td>${esc(g?.name||"—")}</td><td>${esc(m.phone||"—")}</td><td><button class="secondary" onclick="editMember('${m.id}')">تعديل</button> <button class="danger" onclick="deleteMember('${m.id}')">حذف</button></td></tr>`}).join("")}</table></div>`:'<div class="empty">لا يوجد عناصر في هذه الفرقة.</div>';
 
- document.getElementById("teamMembers").innerHTML=ms.length?`
+ let ws=data.workshops.filter(w=>w.teamId===selectedTeam.id||w.teamId==="all");
 
- <div class="table-wrap"><table><tr><th>الاسم</th><th>الطليعة / الرهط</th><th>رقم الهاتف</th><th>إجراء</th></tr>
-
- ${ms.map(m=>`<tr><td>${esc(m.name)}</td><td>${esc(m.group||"—")}</td><td>${esc(m.phone||"—")}</td><td><button class="secondary" onclick="editMember('${m.id}')">تعديل</button> <button class="danger" onclick="deleteMember('${m.id}')">حذف</button></td></tr>`).join("")}</table></div>`
-
- :'<div class="empty">لا يوجد عناصر في هذا الفريق.</div>';
+ document.getElementById("teamWorkshops").innerHTML=ws.length?ws.map(w=>`<p>📘 ${esc(w.name)} — ${esc(w.date||"")}</p>`).join(""):'<div class="empty">لا توجد أنشطة مسجلة لهذه الفرقة.</div>';
 
 }
 
-function addGroup(){
+function renderGroups(){
 
- if(!selectedTeam)return;
+ let box=document.getElementById("groupManagement");
 
- let g=prompt("اسم الطليعة أو الرهط:");
+ if(selectedTeam.type==="none"){box.innerHTML="";return}
 
- if(g&&g.trim()){selectedTeam.groups.push(g.trim());saveData();renderTeamDetails();}
+ box.innerHTML=`<div class="row-between"><h3>${groupPlural(selectedTeam)} الفرقة</h3><button class="action" onclick="showGroupForm()">+ إضافة ${groupWord(selectedTeam)}</button></div><div class="notice">كل ${groupWord(selectedTeam)} يستوعب 12 عنصراً كحد أقصى.</div><div id="groupForm" class="form-box hidden"></div><div id="groupsList"></div>`;
+
+ let list=document.getElementById("groupsList");
+
+ list.innerHTML=selectedTeam.groups.length?selectedTeam.groups.map(g=>`<div class="group-card">
+
+ <button class="group-open" onclick="openGroup('${g.id}')"><strong>${esc(g.name)}</strong><small>${countGroup(g.id)} من 12 عنصراً — اضغط لفتح ${groupWord(selectedTeam)}</small></button>
+
+ <div class="toolbar"><button class="secondary" onclick="openGroup('${g.id}')">فتح ${groupWord(selectedTeam)}</button><button class="secondary" onclick="renameGroup('${g.id}')">تعديل الاسم</button><button class="danger" onclick="deleteGroup('${g.id}')">حذف</button></div>
+
+ </div>`).join(""):'<div class="empty">لم تتم إضافة أي '+groupPlural(selectedTeam)+' بعد.</div>';
 
 }
 
-function addMemberForTeam(){if(selectedTeam)addMember(selectedTeam.id)}
+function showGroupForm(){
 
-function addMember(teamId){
+ let f=document.getElementById("groupForm");f.classList.remove("hidden");
 
- let name=prompt("اسم العنصر الكامل:");if(!name||!name.trim())return;
+ f.innerHTML=`<h3>إضافة ${groupWord(selectedTeam)} جديدة</h3><label>اسم ${groupWord(selectedTeam)}<input id="newGroupName" placeholder="مثلاً: ${groupWord(selectedTeam)} الأولى"></label><button class="action" onclick="saveNewGroup()">حفظ ${groupWord(selectedTeam)}</button> <button class="secondary" onclick="document.getElementById('groupForm').classList.add('hidden')">إلغاء</button>`;
 
- let team=teamId?data.teams.find(t=>t.id==teamId):null;
+ document.getElementById("newGroupName").focus();
 
- if(!team){
+}
 
-  let choices=data.teams.map((t,i)=>`${i+1}- ${t.name}`).join("\n");
+function saveNewGroup(){
 
-  let n=prompt("اختر رقم الفريق:\n"+choices);
+ let name=document.getElementById("newGroupName").value.trim();
 
-  team=data.teams[Number(n)-1];
+ if(!name){alert("اكتب اسم المجموعة أولاً.");return}
 
-  if(!team)return;
+ selectedTeam.groups.push({id:uid(),name});saveData();renderTeamDetails();
+
+}
+
+function renameGroup(id){
+
+ let g=selectedTeam.groups.find(x=>x.id===id);if(!g)return;
+
+ let n=prompt("الاسم الجديد:",g.name);
+
+ if(n?.trim()){g.name=n.trim();saveData();renderTeamDetails()}
+
+}
+
+function deleteGroup(id){
+
+ let g=selectedTeam.groups.find(x=>x.id===id);if(!g)return;
+
+ if(data.members.some(m=>m.groupId===id)){alert("لا يمكن حذف هذه المجموعة قبل نقل عناصرها أو حذفهم.");return}
+
+ if(!confirm("هل تريد حذف "+g.name+"؟"))return;
+
+ selectedTeam.groups=selectedTeam.groups.filter(x=>x.id!==id);saveData();renderTeamDetails();
+
+}
+
+/* صفحة مستقلة لكل طليعة أو رهط */
+
+function openGroup(id){
+
+ selectedGroup=selectedTeam.groups.find(g=>g.id===id);if(!selectedGroup)return;
+
+ document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
+
+ document.getElementById("groupDetails").classList.remove("hidden");
+
+ document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page==="teams"));
+
+ renderGroupDetails();window.scrollTo(0,0);
+
+}
+
+function backToTeam(){
+
+ document.getElementById("groupDetails").classList.add("hidden");
+
+ document.getElementById("teams").classList.remove("hidden");
+
+ renderTeamDetails();window.scrollTo(0,0);
+
+}
+
+function renderGroupDetails(){
+
+ if(!selectedGroup||!selectedTeam)return;
+
+ let count=countGroup(selectedGroup.id);
+
+ document.getElementById("groupDetailsTitle").textContent=selectedGroup.name;
+
+ document.getElementById("groupCapacity").textContent=`عدد العناصر: ${count} من 12. ${count>=12?"اكتمل العدد المسموح.":"يمكنك إضافة "+(12-count)+" عناصر أخرى."}`;
+
+ let ms=data.members.filter(m=>m.groupId===selectedGroup.id);
+
+ document.getElementById("groupMembers").innerHTML=ms.length?`<div class="table-wrap"><table><tr><th>الاسم</th><th>الهاتف</th><th>إجراء</th></tr>${ms.map(m=>`<tr><td>${esc(m.name)}</td><td>${esc(m.phone||"—")}</td><td><button class="secondary" onclick="editMember('${m.id}')">تعديل</button> <button class="danger" onclick="deleteMember('${m.id}')">حذف</button></td></tr>`).join("")}</table></div>`:'<div class="empty">لم تتم إضافة عناصر إلى هذه المجموعة بعد.</div>';
+
+ document.getElementById("groupMemberName").value="";
+
+ document.getElementById("groupMemberPhone").value="";
+
+ document.getElementById("groupMemberName").disabled=count>=12;
+
+ document.querySelector('#groupDetails .form-box .action').disabled=count>=12;
+
+}
+
+function renameSelectedGroup(){
+
+ if(!selectedGroup)return;
+
+ let n=prompt("اسم المجموعة:",selectedGroup.name);
+
+ if(n?.trim()){selectedGroup.name=n.trim();saveData();renderGroupDetails();renderTeamDetails()}
+
+}
+
+function saveGroupMember(){
+
+ if(countGroup(selectedGroup.id)>=12){alert("وصلت المجموعة إلى الحد الأقصى: 12 عنصراً.");return}
+
+ let name=document.getElementById("groupMemberName").value.trim();
+
+ let phone=document.getElementById("groupMemberPhone").value.trim();
+
+ if(!name){alert("اكتب اسم العنصر أولاً.");document.getElementById("groupMemberName").focus();return}
+
+ data.members.push({id:uid(),name,phone,teamId:selectedTeam.id,teamName:selectedTeam.name,groupId:selectedGroup.id});
+
+ saveData();renderGroupDetails();renderTeamDetails();
+
+}
+
+/* إضافة عنصر من صفحة الفرقة */
+
+function showMemberForm(){
+
+ let f=document.getElementById("teamMemberForm");f.classList.remove("hidden");
+
+ if(selectedTeam.type==="none"){
+
+  f.innerHTML=`<h3>إضافة عنصر إلى ${esc(selectedTeam.name)}</h3><label>اسم العنصر<input id="teamNewMemberName" placeholder="اسم العنصر"></label><label>رقم الهاتف (اختياري)<input id="teamNewMemberPhone" placeholder="رقم الهاتف"></label><button class="action" onclick="saveTeamMember()">حفظ العنصر</button>`;
+
+ }else{
+
+  f.innerHTML=`<h3>اختر ${groupPlural(selectedTeam)} لإضافة العنصر</h3><label>المجموعة<select id="teamNewMemberGroup">${selectedTeam.groups.filter(g=>countGroup(g.id)<12).map(g=>`<option value="${g.id}">${esc(g.name)} (${countGroup(g.id)}/12)</option>`).join("")}</select></label><label>اسم العنصر<input id="teamNewMemberName" placeholder="اسم العنصر"></label><label>رقم الهاتف (اختياري)<input id="teamNewMemberPhone" placeholder="رقم الهاتف"></label><button class="action" onclick="saveTeamMember()">حفظ العنصر</button>`;
+
+  if(!selectedTeam.groups.some(g=>countGroup(g.id)<12))f.innerHTML+='<p class="notice">لا توجد أماكن متاحة. أضف مجموعة جديدة أو افتح مجموعة فيها مكان.</p>';
 
  }
 
- let group="";
+}
 
- if(team.groups.length){
+function saveTeamMember(){
 
-  group=prompt("اسم الطليعة أو الرهط (اتركه فارغاً إن لم يوجد):","")||"";
+ let name=document.getElementById("teamNewMemberName").value.trim();
+
+ let phone=document.getElementById("teamNewMemberPhone").value.trim();
+
+ if(!name){alert("اكتب اسم العنصر.");return}
+
+ let groupId="";
+
+ if(selectedTeam.type!=="none"){
+
+  groupId=document.getElementById("teamNewMemberGroup")?.value||"";
+
+  if(!groupId){alert("أضف مجموعة فيها مكان أولاً.");return}
+
+  if(countGroup(groupId)>=12){alert("هذه المجموعة مكتملة.");return}
 
  }
 
- let phone=prompt("رقم الهاتف (اختياري):")||"";
+ data.members.push({id:uid(),name,phone,teamId:selectedTeam.id,teamName:selectedTeam.name,groupId});
 
- data.members.push({id:uid(),name:name.trim(),teamId:team.id,teamName:team.name,group,phone});
+ saveData();document.getElementById("teamMemberForm").classList.add("hidden");renderTeamDetails();
 
- saveData();renderMembers();if(selectedTeam)renderTeamDetails();
+}
+
+/* العناصر */
+
+function showGeneralMemberForm(){
+
+ let f=document.getElementById("generalMemberForm");f.classList.remove("hidden");
+
+ f.innerHTML=`<h3>إضافة عنصر جديد</h3><label>الفرقة<select id="generalTeam" onchange="updateGeneralGroupOptions()">${data.teams.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join("")}</select></label><div id="generalGroupOptions"></div><label>اسم العنصر<input id="generalMemberName" placeholder="اسم العنصر"></label><label>رقم الهاتف (اختياري)<input id="generalMemberPhone" placeholder="رقم الهاتف"></label><button class="action" onclick="saveGeneralMember()">حفظ العنصر</button>`;
+
+ updateGeneralGroupOptions();
+
+}
+
+function updateGeneralGroupOptions(){
+
+ let t=data.teams.find(x=>x.id===document.getElementById("generalTeam").value);
+
+ let box=document.getElementById("generalGroupOptions");
+
+ if(t?.type==="none"){box.innerHTML="";return}
+
+ let gs=t.groups.filter(g=>countGroup(g.id)<12);
+
+ box.innerHTML=`<label>${t?.type==="talaya"?"الطليعة":"الرهط"}<select id="generalGroup">${gs.map(g=>`<option value="${g.id}">${esc(g.name)} (${countGroup(g.id)}/12)</option>`).join("")}</select></label>${gs.length?"":'<p class="notice">لا توجد أماكن متاحة. أضف مجموعة جديدة من صفحة الفرقة.</p>'}`;
+
+}
+
+function saveGeneralMember(){
+
+ let t=data.teams.find(x=>x.id===document.getElementById("generalTeam").value);
+
+ let name=document.getElementById("generalMemberName").value.trim();
+
+ let phone=document.getElementById("generalMemberPhone").value.trim();
+
+ if(!name){alert("اكتب اسم العنصر.");return}
+
+ let groupId="";
+
+ if(t.type!=="none"){
+
+  groupId=document.getElementById("generalGroup")?.value||"";
+
+  if(!groupId){alert("اختر مجموعة فيها مكان.");return}
+
+  if(countGroup(groupId)>=12){alert("هذه المجموعة مكتملة.");return}
+
+ }
+
+ data.members.push({id:uid(),name,phone,teamId:t.id,teamName:t.name,groupId});
+
+ saveData();renderMembers();document.getElementById("generalMemberForm").classList.add("hidden");
 
 }
 
 function renderMembers(){
 
- let q=(document.getElementById("memberSearch")?.value||"").trim().toLowerCase();
+ let q=(document.getElementById("memberSearch")?.value||"").toLowerCase();
 
  let ms=data.members.filter(m=>m.name.toLowerCase().includes(q)||m.teamName.toLowerCase().includes(q));
 
- document.getElementById("membersTable").innerHTML=ms.length?`
-
- <table><tr><th>الاسم</th><th>الفريق</th><th>الطليعة / الرهط</th><th>الهاتف</th><th>إجراء</th></tr>
-
- ${ms.map(m=>`<tr><td>${esc(m.name)}</td><td>${esc(m.teamName)}</td><td>${esc(m.group||"—")}</td><td>${esc(m.phone||"—")}</td><td><button class="secondary" onclick="editMember('${m.id}')">تعديل</button> <button class="danger" onclick="deleteMember('${m.id}')">حذف</button></td></tr>`).join("")}</table>`
-
- :'<div class="empty">لا توجد عناصر مطابقة.</div>';
+ document.getElementById("membersTable").innerHTML=ms.length?`<table><tr><th>الاسم</th><th>الفرقة</th><th>الطليعة / الرهط</th><th>الهاتف</th><th>إجراء</th></tr>${ms.map(m=>{let t=data.teams.find(x=>x.id===m.teamId);let g=t?.groups.find(x=>x.id===m.groupId);return `<tr><td>${esc(m.name)}</td><td>${esc(m.teamName)}</td><td>${esc(g?.name||"—")}</td><td>${esc(m.phone||"—")}</td><td><button class="secondary" onclick="editMember('${m.id}')">تعديل</button> <button class="danger" onclick="deleteMember('${m.id}')">حذف</button></td></tr>`}).join("")}</table>`:'<div class="empty">لا توجد عناصر مطابقة.</div>';
 
 }
 
 function editMember(id){
 
- let m=data.members.find(x=>x.id==id);if(!m)return;
+ let m=data.members.find(x=>x.id===id);if(!m)return;
 
- let name=prompt("اسم العنصر:",m.name);if(!name||!name.trim())return;
+ let n=prompt("اسم العنصر:",m.name);if(!n?.trim())return;
 
- m.name=name.trim();
+ m.name=n.trim();
 
- let phone=prompt("رقم الهاتف:",m.phone||"");if(phone!==null)m.phone=phone;
+ let p=prompt("رقم الهاتف:",m.phone||"");if(p!==null)m.phone=p;
 
- let team=data.teams.find(t=>t.id==m.teamId);
-
- if(team&&team.groups.length){
-
-  let group=prompt("الطليعة أو الرهط:",m.group||"");if(group!==null)m.group=group;
-
- }
-
- saveData();renderMembers();if(selectedTeam)renderTeamDetails();
+ saveData();renderMembers();if(selectedGroup)renderGroupDetails();if(selectedTeam)renderTeamDetails();
 
 }
 
@@ -632,71 +776,53 @@ function deleteMember(id){
 
  if(!confirm("هل تريد حذف هذا العنصر؟"))return;
 
- data.members=data.members.filter(m=>m.id!=id);
+ data.members=data.members.filter(m=>m.id!==id);saveData();renderMembers();
 
- saveData();renderMembers();if(selectedTeam)renderTeamDetails();
+ if(selectedGroup)renderGroupDetails();if(selectedTeam)renderTeamDetails();
 
 }
 
-function addWorkshop(){
+/* الورش والأنشطة */
 
- let name=prompt("اسم الورشة أو النشاط:");if(!name||!name.trim())return;
+function showWorkshopForm(){
 
- let teamChoices="0- جميع الفرق\n"+data.teams.map((t,i)=>`${i+1}- ${t.name}`).join("\n");
+ let f=document.getElementById("workshopForm");f.classList.remove("hidden");
 
- let choice=prompt("اختر الفريق:\n"+teamChoices,"0");
+ f.innerHTML=`<h3>إنشاء ورشة أو نشاط</h3><label>اسم النشاط<input id="newWorkshopName" placeholder="اسم الورشة أو النشاط"></label><label>الفرقة<select id="newWorkshopTeam"><option value="all">جميع الفرق</option>${data.teams.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join("")}</select></label><label>التاريخ<input type="date" id="newWorkshopDate"></label><label>المكان<input id="newWorkshopPlace" placeholder="مكان النشاط"></label><label>التفاصيل<textarea id="newWorkshopDesc" rows="3"></textarea></label><button class="action" onclick="saveWorkshop()">حفظ النشاط</button> <button class="secondary" onclick="document.getElementById('workshopForm').classList.add('hidden')">إلغاء</button>`;
 
- let team=choice==="0"?null:data.teams[Number(choice)-1];
+}
 
- if(choice!=="0"&&!team)return;
+function saveWorkshop(){
 
- let date=prompt("التاريخ (مثال: 2026-11-20):","")||"";
+ let name=document.getElementById("newWorkshopName").value.trim();
 
- let place=prompt("المكان:","")||"";
+ if(!name){alert("اكتب اسم النشاط.");return}
 
- let description=prompt("ملاحظات أو تفاصيل (اختياري):","")||"";
+ let id=document.getElementById("newWorkshopTeam").value;
 
- data.workshops.push({id:uid(),name:name.trim(),teamId:team?.id||"all",teamName:team?.name||"جميع الفرق",date,place,description});
+ let t=data.teams.find(x=>x.id===id);
 
- saveData();renderWorkshops();
+ data.workshops.push({id:uid(),name,teamId:id,teamName:t?.name||"جميع الفرق",date:document.getElementById("newWorkshopDate").value,place:document.getElementById("newWorkshopPlace").value,description:document.getElementById("newWorkshopDesc").value});
+
+ saveData();document.getElementById("workshopForm").classList.add("hidden");renderWorkshops();
 
 }
 
 function renderWorkshops(){
 
- document.getElementById("workshopsList").innerHTML=data.workshops.length?data.workshops.slice().reverse().map(w=>`
-
- <div class="team-card" style="margin-bottom:10px">
-
-  <div class="row-between"><strong>${esc(w.name)}</strong><span class="tag">${esc(w.teamName)}</span></div>
-
-  <p style="font-size:13px;color:var(--muted)">📅 ${esc(w.date||"غير محدد")}　📍 ${esc(w.place||"غير محدد")}</p>
-
-  ${w.description?`<p>${esc(w.description)}</p>`:""}
-
-  <div class="toolbar">
-
-   <button class="secondary" onclick="editWorkshop('${w.id}')">تعديل</button>
-
-   <button class="secondary" onclick="goToWorkshopAttendance('${w.id}')">تسجيل الحضور</button>
-
-   <button class="danger" onclick="deleteWorkshop('${w.id}')">حذف</button>
-
-  </div>
-
- </div>`).join(""):'<div class="empty">لم تتم إضافة أي ورشة أو نشاط بعد.</div>';
+ document.getElementById("workshopsList").innerHTML=data.workshops.length?data.workshops.slice().reverse().map(w=>`<div class="team-card"><div class="row-between"><strong>${esc(w.name)}</strong><span class="tag">${esc(w.teamName)}</span></div><p>📅 ${esc(w.date||"غير محدد")}　📍 ${esc(w.place||"غير محدد")}</p><p>${esc(w.description||"")}</p><div class="toolbar"><button class="secondary" onclick="editWorkshop('${w.id}')">تعديل</button><button class="secondary" onclick="goToAttendance('${w.id}')">تسجيل الحضور</button><button class="danger" onclick="deleteWorkshop('${w.id}')">حذف</button></div></div>`).join(""):'<div class="empty">لا توجد ورش أو أنشطة بعد.</div>';
 
 }
 
 function editWorkshop(id){
 
- let w=data.workshops.find(x=>x.id==id);if(!w)return;
+ let w=data.workshops.find(x=>x.id===id);if(!w)return;
 
- let name=prompt("اسم النشاط:",w.name);if(name&&name.trim())w.name=name.trim();
+ let n=prompt("اسم النشاط:",w.name);if(n?.trim())w.name=n.trim();
 
- let date=prompt("التاريخ:",w.date);if(date!==null)w.date=date;
+ let d=prompt("التاريخ:",w.date||"");if(d!==null)w.date=d;
 
- let place=prompt("المكان:",w.place);if(place!==null)w.place=place;
+ let p=prompt("المكان:",w.place||"");if(p!==null)w.place=p;
 
  saveData();renderWorkshops();
 
@@ -704,29 +830,19 @@ function editWorkshop(id){
 
 function deleteWorkshop(id){
 
- if(!confirm("حذف هذه الورشة؟"))return;
+ if(!confirm("حذف النشاط؟"))return;
 
- data.workshops=data.workshops.filter(w=>w.id!=id);
-
- saveData();renderWorkshops();
+ data.workshops=data.workshops.filter(w=>w.id!==id);data.attendance=data.attendance.filter(a=>a.workshopId!==id);saveData();renderWorkshops();
 
 }
 
-function goToWorkshopAttendance(id){
+function goToAttendance(id){showPage("attendance");document.getElementById("attendanceWorkshop").value=id;renderAttendance()}
 
- showPage("attendance");
-
- document.getElementById("attendanceWorkshop").value=id;
-
- renderAttendance();
-
-}
+/* الحضور */
 
 function prepareAttendance(){
 
- let s=document.getElementById("attendanceWorkshop");
-
- s.innerHTML='<option value="">اختر النشاط</option>'+data.workshops.map(w=>`<option value="${w.id}">${esc(w.name)} — ${esc(w.date||"")}</option>`).join("");
+ document.getElementById("attendanceWorkshop").innerHTML='<option value="">اختر النشاط</option>'+data.workshops.map(w=>`<option value="${w.id}">${esc(w.name)} — ${esc(w.date||"")}</option>`).join("");
 
  renderAttendance();
 
@@ -734,63 +850,39 @@ function prepareAttendance(){
 
 function renderAttendance(){
 
- let id=document.getElementById("attendanceWorkshop").value;
+ let id=document.getElementById("attendanceWorkshop").value,w=data.workshops.find(x=>x.id===id),area=document.getElementById("attendanceArea");
 
- let w=data.workshops.find(x=>x.id==id);
+ if(!w){area.innerHTML='<div class="empty">اختر ورشة أو نشاطاً.</div>';return}
 
- let area=document.getElementById("attendanceArea");
+ let ms=data.members.filter(m=>w.teamId==="all"||m.teamId===w.teamId);
 
- if(!w){area.innerHTML='<div class="empty">اختر ورشة أو نشاطاً لعرض العناصر.</div>';return}
+ let old=data.attendance.find(a=>a.workshopId===id);attendanceDraft={};
 
- let members=data.members.filter(m=>w.teamId==="all"||m.teamId==w.teamId);
+ ms.forEach(m=>attendanceDraft[m.id]=old?.records?.[m.id]||"غائب");
 
- let old=data.attendance.find(a=>a.workshopId==id);
-
- attendanceDraft={};
-
- members.forEach(m=>attendanceDraft[m.id]=old?.records?.[m.id]||"غائب");
-
- area.innerHTML=members.length?`
-
- <div class="notice">النشاط: <b>${esc(w.name)}</b> — عدد العناصر: ${members.length}</div>
-
- <div class="table-wrap"><table><tr><th>العنصر</th><th>الفريق</th><th>الحضور</th></tr>
-
- ${members.map(m=>`<tr><td>${esc(m.name)}</td><td>${esc(m.teamName)}</td><td><select onchange="attendanceDraft['${m.id}']=this.value">
-
- <option value="حاضر" ${attendanceDraft[m.id]==="حاضر"?"selected":""}>حاضر</option>
-
- <option value="غائب" ${attendanceDraft[m.id]==="غائب"?"selected":""}>غائب</option>
-
- <option value="بعذر" ${attendanceDraft[m.id]==="بعذر"?"selected":""}>غائب بعذر</option>
-
- </select></td></tr>`).join("")}</table></div>`
-
- :'<div class="empty">لا يوجد عناصر مسجلون في هذا النشاط أو الفريق.</div>';
+ area.innerHTML=ms.length?`<div class="notice">${esc(w.name)} — ${ms.length} عنصر</div><div class="table-wrap"><table><tr><th>العنصر</th><th>الفرقة</th><th>الحضور</th></tr>${ms.map(m=>`<tr><td>${esc(m.name)}</td><td>${esc(m.teamName)}</td><td><select onchange="attendanceDraft['${m.id}']=this.value"><option value="حاضر" ${attendanceDraft[m.id]==="حاضر"?"selected":""}>حاضر</option><option value="غائب" ${attendanceDraft[m.id]==="غائب"?"selected":""}>غائب</option><option value="بعذر" ${attendanceDraft[m.id]==="بعذر"?"selected":""}>غائب بعذر</option></select></td></tr>`).join("")}</table></div>`:'<div class="empty">لا يوجد عناصر في هذا النشاط.</div>';
 
 }
 
 function saveAttendance(){
 
- let id=document.getElementById("attendanceWorkshop").value;
+ let id=document.getElementById("attendanceWorkshop").value;if(!id){alert("اختر النشاط أولاً.");return}
 
- if(!id){alert("اختر النشاط أولاً.");return}
+ let a=data.attendance.find(x=>x.workshopId===id);
 
- let existing=data.attendance.find(a=>a.workshopId==id);
-
- if(existing){existing.records={...attendanceDraft};existing.updatedAt=new Date().toISOString();}
-
- else data.attendance.push({id:uid(),workshopId:id,records:{...attendanceDraft},updatedAt:new Date().toISOString()});
+ if(a)a.records={...attendanceDraft};else data.attendance.push({id:uid(),workshopId:id,records:{...attendanceDraft}});
 
  saveData();alert("تم حفظ الحضور.");
 
 }
 
+/* التصدير والنسخ الاحتياطي */
+
 function csvDownload(filename,rows){
 
  let csv="\uFEFF"+rows.map(r=>r.map(v=>'"'+String(v??"").replace(/"/g,'""')+'"').join(",")).join("\n");
 
- let blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
+ let blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
 
  let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=filename;a.click();URL.revokeObjectURL(a.href);
 
@@ -798,27 +890,15 @@ function csvDownload(filename,rows){
 
 function exportMembers(){
 
- csvDownload("عناصر_الفوج.csv",[["الاسم","الفريق","الطليعة أو الرهط","الهاتف"],...data.members.map(m=>[m.name,m.teamName,m.group,m.phone])]);
+ csvDownload("عناصر_الفوج.csv",[["الاسم","الفرقة","الطليعة أو الرهط","الهاتف"],...data.members.map(m=>{let t=data.teams.find(x=>x.id===m.teamId),g=t?.groups.find(x=>x.id===m.groupId);return [m.name,m.teamName,g?.name||"",m.phone]})]);
 
 }
 
 function exportAttendance(){
 
- let rows=[["النشاط","التاريخ","العنصر","الفريق","الحالة"]];
+ let rows=[["النشاط","العنصر","الفرقة","الحالة"]];
 
- data.attendance.forEach(a=>{
-
-  let w=data.workshops.find(x=>x.id==a.workshopId);
-
-  Object.entries(a.records).forEach(([mid,status])=>{
-
-   let m=data.members.find(x=>x.id==mid);
-
-   if(m)rows.push([w?.name||"",w?.date||"",m.name,m.teamName,status]);
-
-  });
-
- });
+ data.attendance.forEach(a=>{let w=data.workshops.find(x=>x.id===a.workshopId);Object.entries(a.records).forEach(([id,s])=>{let m=data.members.find(x=>x.id===id);if(m)rows.push([w?.name||"",m.name,m.teamName,s])})});
 
  csvDownload("حضور_الفوج.csv",rows);
 
@@ -834,6 +914,16 @@ function loadSettings(){
 
 }
 
+function applySettings(){
+
+ document.documentElement.style.setProperty("--blue",data.settings.blue);
+
+ document.documentElement.style.setProperty("--navy",data.settings.navy);
+
+ document.getElementById("siteTitle").textContent=data.settings.title;
+
+}
+
 function saveSettings(){
 
  data.settings.title=document.getElementById("settingTitle").value.trim()||"فوج بيت ليف";
@@ -846,57 +936,46 @@ function saveSettings(){
 
 }
 
-function applySettings(){
-
- document.documentElement.style.setProperty("--blue",data.settings.blue);
-
- document.documentElement.style.setProperty("--navy",data.settings.navy);
-
- document.getElementById("siteTitle").textContent=data.settings.title;
-
-}
-
 function backupData(){
 
- let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+ let b=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
 
- let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="نسخة_احتياطية_لفوج_بيت_ليف.json";a.click();URL.revokeObjectURL(a.href);
+ let a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="نسخة_احتياطية_فوج_بيت_ليف.json";a.click();URL.revokeObjectURL(a.href);
 
 }
 
-function restoreData(event){
+function restoreData(e){
 
- let file=event.target.files[0];if(!file)return;
+ let f=e.target.files[0];if(!f)return;
 
- let reader=new FileReader();
+ let r=new FileReader();
 
- reader.onload=()=>{
+ r.onload=()=>{
 
   try{
 
-   let restored=JSON.parse(reader.result);
+   let d=JSON.parse(r.result);
 
-   if(!restored.teams||!restored.members||!restored.workshops)throw new Error();
+   if(!d.teams||!d.members||!d.workshops)throw Error();
 
-   if(!confirm("سيتم استبدال البيانات الحالية بالنسخة المختارة. متابعة؟"))return;
+   if(!confirm("استبدال البيانات الحالية بالنسخة الاحتياطية؟"))return;
 
-   data=restored;saveData();applySettings();alert("تمت استعادة النسخة الاحتياطية.");showPage("home");
+   data=d;data.teams.forEach(t=>{let def=defaultTeams.find(x=>x.id===t.id);t.type=def?.type||t.type||"none";t.name=def?.name||t.name;t.groups=(t.groups||[]).map(g=>typeof g==="string"?{id:uid(),name:g}:g)});
 
-  }catch(e){alert("الملف غير صالح أو ليس نسخة احتياطية من الموقع.");}
+   saveData();applySettings();alert("تمت استعادة النسخة الاحتياطية.");showPage("home");
+
+  }catch(err){alert("الملف غير صالح.");}
 
  };
 
- reader.readAsText(file);
+ r.readAsText(f);e.target.value="";
 
 }
 
-applySettings();
-
-updateDashboard();
+applySettings();saveData();showPage("home");
 
 </script>
 
 </body>
 
 </html>
-
