@@ -182,7 +182,8 @@ th{background:var(--light);color:var(--navy)}.table-wrap{overflow-x:auto}
 <label>اسم المتبرع<input id="donName" list="donNames" placeholder="اسم المتبرع" autocomplete="off"></label>
 <label>المبلغ<input type="number" step="any" inputmode="decimal" id="donAmount" placeholder="المبلغ"></label>
 <label>تاريخ التبرع<input type="date" id="donDate"></label>
-<label>ملاحظة (اختياري)<input id="donNote" placeholder="ملاحظة"></label>
+<label>المناسبة (اختياري)<select id="donOccasion"></select></label>
+<label style="grid-column:1/-1">التفاصيل (اختياري)<textarea id="donNote" rows="2" placeholder="تفاصيل التبرع (مثلاً: عن شهر كذا، لغرض كذا...)"></textarea></label>
 </div>
 <datalist id="donNames"></datalist>
 <div class="toolbar"><button class="action" id="donSaveBtn" onclick="saveDonation()">حفظ التبرع</button><button class="secondary" onclick="resetDonForm()">مسح</button></div></div>
@@ -194,9 +195,10 @@ th{background:var(--light);color:var(--navy)}.table-wrap{overflow-x:auto}
 <div id="fin_expenses" class="finTab hidden">
 <div class="form-box no-print"><h3 id="expFormTitle">تسجيل مصروف</h3>
 <div class="form-grid">
-<label>نوع المصروف<select id="expType"></select></label>
+<label>نوع المصروف<input id="expType" list="expTypes" placeholder="اكتب النوع (مثلاً: قرطاسية)" autocomplete="off"></label><datalist id="expTypes"></datalist>
 <label>المبلغ<input type="number" step="any" inputmode="decimal" id="expAmount" placeholder="المبلغ"></label>
 <label>تاريخ المصروف<input type="date" id="expDate"></label>
+<label>المناسبة (اختياري)<select id="expOccasion"></select></label>
 <label>التفاصيل<input id="expDesc" placeholder="شو انصرف عليه"></label>
 </div>
 <div class="toolbar"><button class="action" id="expSaveBtn" onclick="saveExpense()">حفظ المصروف</button><button class="secondary" onclick="resetExpForm()">مسح</button></div></div>
@@ -225,6 +227,13 @@ th{background:var(--light);color:var(--navy)}.table-wrap{overflow-x:auto}
 <label>اللون الأساسي<input type="color" id="settingBlue" value="#1262ad"></label>
 <label>اللون الكحلي<input type="color" id="settingNavy" value="#082b55"></label>
 <button class="action" onclick="saveSettings()">حفظ الإعدادات</button>
+</div>
+<div class="panel">
+<h2>المناسبات</h2>
+<div class="notice">إنت بتحدد المناسبات هون. أمين الصندوق بيختار منها بالتبرعات والمصاريف، وقادة الفرق والثقافي بيختاروا منها لما يعملوا نشاط.</div>
+<div class="form-box"><label>اسم المناسبة<input id="newOccName" placeholder="مثلاً: عاشوراء، مخيم الصيف، رحلة الجبل"></label>
+<button class="action" onclick="addOccasion()">+ إضافة مناسبة</button></div>
+<div id="occList"></div>
 </div>
 <div class="panel">
 <h2>النسخ الاحتياطي</h2>
@@ -299,6 +308,7 @@ catch(e){error.textContent="تعذّر تسجيل الدخول. تأكد من ا
 function logoutUser(){auth.signOut()}
 
 /* ===== المالية ===== */
+let occasions=[];
 let fin={donations:[],expenses:[],meta:{currency:"$",opening:0}},editingDon=null,editingExp=null,finTab="summary";
 const EXP_TYPES=["قرطاسية ومستلزمات","نشاطات وورش","رحلات ومخيمات","لباس كشفي","نقل ومواصلات","ضيافة","إيجار وفواتير","صيانة ومعدات","أخرى"];
 const MONTHS=["كانون الثاني","شباط","آذار","نيسان","أيار","حزيران","تموز","آب","أيلول","تشرين الأول","تشرين الثاني","كانون الأول"];
@@ -313,6 +323,17 @@ function yOf(d){return String(d||"").slice(0,4)}
 function sumA(a){return a.reduce((s,x)=>s+(Number(x.amount)||0),0)}
 function monthLabel(ym){const p=String(ym).split("-");return (MONTHS[(+p[1])-1]||"")+" "+p[0]}
 function prevMonth(ym){const p=ym.split("-").map(Number),d=new Date(p[0],p[1]-2,1);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")}
+function occName(id,snap){const o=occasions.find(x=>x.id===id);return o?o.name:(snap||"")}
+function occOf(x){return x&&x.occasionId?occName(x.occasionId,x.occasionName):""}
+function occPick(id){const el=document.getElementById(id);const v=el?el.value:"";if(!v)return {occasionId:"",occasionName:""};return {occasionId:v,occasionName:occName(v)}}
+function fillOccasionSelects(){
+["donOccasion","expOccasion"].forEach(id=>{
+const el=document.getElementById(id);if(!el)return;
+const v=el.value;
+el.innerHTML='<option value="">بدون مناسبة</option>'+occasions.map(o=>`<option value="${o.id}">${esc(o.name)}</option>`).join("");
+el.value=occasions.some(o=>o.id===v)?v:"";
+});
+}
 function finRef(p){return db.ref("finance/"+p)}
 function finErr(e){console.error(e);alert("تعذّر الحفظ. تأكد من الصلاحيات والاتصال.")}
 function byDateDesc(a,b){return a.date<b.date?1:a.date>b.date?-1:0}
@@ -321,7 +342,6 @@ const t=todayStr();
 ["donDate","expDate"].forEach(id=>{const e=document.getElementById(id);if(e&&!e.value)e.value=t});
 ["finDonMonth","finExpMonth","finRepMonth"].forEach(id=>{const e=document.getElementById(id);if(e&&!e.dataset.init){e.value=curMonth();e.dataset.init="1"}});
 const y=document.getElementById("finRepYear");if(y&&!y.value)y.value=new Date().getFullYear();
-const ts=document.getElementById("expType");if(ts&&!ts.options.length)ts.innerHTML=EXP_TYPES.map(x=>`<option>${esc(x)}</option>`).join("");
 showFinTab(finTab);
 }
 function showFinTab(t){
@@ -333,6 +353,7 @@ renderFinance();
 }
 function renderFinance(){
 if(!canFinance()||!document.getElementById("fin_summary"))return;
+fillOccasionSelects();
 const c=document.getElementById("finCurrency");if(c)c.value=fin.meta.currency||"$";
 renderFinSummary();renderDonations();renderExpenses();renderMonthly();renderYearly();
 }
@@ -347,7 +368,8 @@ document.getElementById("finSummaryBox").innerHTML=`<div class="grid">
 <div class="stat"><strong>${money(sumA(d))}</strong><span>تبرعات ${esc(monthLabel(m))}</span></div>
 <div class="stat"><strong>${money(sumA(e))}</strong><span>مصاريف ${esc(monthLabel(m))}</span></div>
 <div class="stat"><strong>${signed(sumA(d)-sumA(e))}</strong><span>صافي هذا الشهر</span></div></div>
-${missing.length?`<div class="notice" style="margin-top:12px"><b>تبرعوا الشهر الماضي ولسا ما تبرعوا هذا الشهر:</b><br>${missing.map(esc).join("، ")}</div>`:""}`;
+${missing.length?`<div class="notice" style="margin-top:12px"><b>تبرعوا الشهر الماضي ولسا ما تبرعوا هذا الشهر:</b><br>${missing.map(esc).join("، ")}</div>`:""}
+<h3>حسب المناسبة (الإجمالي)</h3><div class="table-wrap">${occTable(occBreak(fin.donations,fin.expenses))}</div>`;
 const o=document.getElementById("finOpening");if(o&&document.activeElement!==o)o.value=fin.meta.opening||"";
 }
 function saveOpening(){
@@ -361,6 +383,7 @@ function resetDonForm(){
 editingDon=null;
 ["donName","donAmount","donNote"].forEach(i=>document.getElementById(i).value="");
 document.getElementById("donDate").value=todayStr();
+document.getElementById("donOccasion").value="";
 document.getElementById("donFormTitle").textContent="تسجيل تبرع";
 document.getElementById("donSaveBtn").textContent="حفظ التبرع";
 }
@@ -372,7 +395,7 @@ if(!name){alert("اكتب اسم المتبرع.");return}
 if(!(amount>0)){alert("اكتب مبلغاً صحيحاً.");return}
 if(!date){alert("اختر التاريخ.");return}
 const id=editingDon||uid();
-finRef("donations/"+id).set({donorName:name,amount,date,note:document.getElementById("donNote").value.trim()}).then(resetDonForm).catch(finErr);
+finRef("donations/"+id).set({donorName:name,amount,date,note:document.getElementById("donNote").value.trim(),...occPick("donOccasion")}).then(resetDonForm).catch(finErr);
 }
 function editDonation(id){
 const x=fin.donations.find(d=>d.id===id);if(!x)return;
@@ -381,6 +404,7 @@ document.getElementById("donName").value=x.donorName||"";
 document.getElementById("donAmount").value=x.amount;
 document.getElementById("donDate").value=x.date||todayStr();
 document.getElementById("donNote").value=x.note||"";
+fillOccasionSelects();document.getElementById("donOccasion").value=x.occasionId||"";
 document.getElementById("donFormTitle").textContent="تعديل تبرع";
 document.getElementById("donSaveBtn").textContent="حفظ التعديل";
 document.getElementById("donName").scrollIntoView({behavior:"smooth",block:"center"});
@@ -391,35 +415,36 @@ const el=document.getElementById("donList");if(!el)return;
 document.getElementById("donNames").innerHTML=[...new Set(fin.donations.map(x=>x.donorName))].map(n=>`<option value="${esc(n)}">`).join("");
 const m=document.getElementById("finDonMonth").value;
 const l=fin.donations.filter(x=>!m||mOf(x.date)===m).sort(byDateDesc);
-el.innerHTML=l.length?`<table><tr><th>التاريخ</th><th>المتبرع</th><th>المبلغ</th><th>ملاحظة</th><th class="no-print">إجراء</th></tr>${l.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.donorName)}</td><td>${money(x.amount)}</td><td>${esc(x.note||"")}</td><td class="no-print"><button class="secondary" onclick="editDonation('${x.id}')">تعديل</button> <button class="danger" onclick="deleteDonation('${x.id}')">حذف</button></td></tr>`).join("")}<tr class="fin-total"><td colspan="2">المجموع (${l.length})</td><td colspan="3">${money(sumA(l))}</td></tr></table>`:'<div class="empty">لا توجد تبرعات.</div>';
+el.innerHTML=l.length?`<table><tr><th>التاريخ</th><th>المتبرع</th><th>المناسبة</th><th>المبلغ</th><th>التفاصيل</th><th class="no-print">إجراء</th></tr>${l.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.donorName)}</td><td>${esc(occOf(x))}</td><td>${money(x.amount)}</td><td>${esc(x.note||"")}</td><td class="no-print"><button class="secondary" onclick="editDonation('${x.id}')">تعديل</button> <button class="danger" onclick="deleteDonation('${x.id}')">حذف</button></td></tr>`).join("")}<tr class="fin-total"><td colspan="3">المجموع (${l.length})</td><td colspan="3">${money(sumA(l))}</td></tr></table>`:'<div class="empty">لا توجد تبرعات.</div>';
 }
 
 /* المصاريف */
 function resetExpForm(){
 editingExp=null;
-["expAmount","expDesc"].forEach(i=>document.getElementById(i).value="");
+["expType","expAmount","expDesc"].forEach(i=>document.getElementById(i).value="");
 document.getElementById("expDate").value=todayStr();
+document.getElementById("expOccasion").value="";
 document.getElementById("expFormTitle").textContent="تسجيل مصروف";
 document.getElementById("expSaveBtn").textContent="حفظ المصروف";
 }
 function saveExpense(){
-const type=document.getElementById("expType").value;
+const type=document.getElementById("expType").value.trim();
+if(!type){alert("اكتب نوع المصروف.");return}
 const amount=Number(document.getElementById("expAmount").value);
 const date=document.getElementById("expDate").value;
 if(!(amount>0)){alert("اكتب مبلغاً صحيحاً.");return}
 if(!date){alert("اختر التاريخ.");return}
 const id=editingExp||uid();
-finRef("expenses/"+id).set({type,amount,date,description:document.getElementById("expDesc").value.trim()}).then(resetExpForm).catch(finErr);
+finRef("expenses/"+id).set({type,amount,date,description:document.getElementById("expDesc").value.trim(),...occPick("expOccasion")}).then(resetExpForm).catch(finErr);
 }
 function editExpense(id){
 const x=fin.expenses.find(d=>d.id===id);if(!x)return;
 editingExp=id;
-const t=document.getElementById("expType");
-if(![...t.options].some(o=>o.value===x.type))t.innerHTML+=`<option>${esc(x.type)}</option>`;
-t.value=x.type;
+const t=document.getElementById("expType");t.value=x.type||"";
 document.getElementById("expAmount").value=x.amount;
 document.getElementById("expDate").value=x.date||todayStr();
 document.getElementById("expDesc").value=x.description||"";
+fillOccasionSelects();document.getElementById("expOccasion").value=x.occasionId||"";
 document.getElementById("expFormTitle").textContent="تعديل مصروف";
 document.getElementById("expSaveBtn").textContent="حفظ التعديل";
 t.scrollIntoView({behavior:"smooth",block:"center"});
@@ -427,9 +452,10 @@ t.scrollIntoView({behavior:"smooth",block:"center"});
 function deleteExpense(id){if(confirm("حذف هذا المصروف؟"))finRef("expenses/"+id).remove().catch(finErr)}
 function renderExpenses(){
 const el=document.getElementById("expList");if(!el)return;
+document.getElementById("expTypes").innerHTML=[...new Set([...EXP_TYPES,...fin.expenses.map(x=>x.type).filter(Boolean)])].map(t=>`<option value="${esc(t)}">`).join("");
 const m=document.getElementById("finExpMonth").value;
 const l=fin.expenses.filter(x=>!m||mOf(x.date)===m).sort(byDateDesc);
-el.innerHTML=l.length?`<table><tr><th>التاريخ</th><th>النوع</th><th>التفاصيل</th><th>المبلغ</th><th class="no-print">إجراء</th></tr>${l.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.type)}</td><td>${esc(x.description||"")}</td><td>${money(x.amount)}</td><td class="no-print"><button class="secondary" onclick="editExpense('${x.id}')">تعديل</button> <button class="danger" onclick="deleteExpense('${x.id}')">حذف</button></td></tr>`).join("")}<tr class="fin-total"><td colspan="3">المجموع (${l.length})</td><td colspan="2">${money(sumA(l))}</td></tr></table>`:'<div class="empty">لا توجد مصاريف.</div>';
+el.innerHTML=l.length?`<table><tr><th>التاريخ</th><th>النوع</th><th>المناسبة</th><th>التفاصيل</th><th>المبلغ</th><th class="no-print">إجراء</th></tr>${l.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.type)}</td><td>${esc(occOf(x))}</td><td>${esc(x.description||"")}</td><td>${money(x.amount)}</td><td class="no-print"><button class="secondary" onclick="editExpense('${x.id}')">تعديل</button> <button class="danger" onclick="deleteExpense('${x.id}')">حذف</button></td></tr>`).join("")}<tr class="fin-total"><td colspan="4">المجموع (${l.length})</td><td colspan="2">${money(sumA(l))}</td></tr></table>`:'<div class="empty">لا توجد مصاريف.</div>';
 }
 
 /* التقارير */
@@ -452,11 +478,23 @@ run+=d-e;rows.push({ym,d,e,net:d-e,close:run});
 const yd=fin.donations.filter(x=>yOf(x.date)===y),ye=fin.expenses.filter(x=>yOf(x.date)===y);
 const donors={};
 yd.forEach(x=>{const o=donors[x.donorName]=donors[x.donorName]||{total:0,months:new Set()};o.total+=Number(x.amount)||0;o.months.add(mOf(x.date))});
-return {y,open,rows,don:sumA(yd),exp:sumA(ye),byType:byType(ye),donors,close:run};
+return {y,open,rows,don:sumA(yd),exp:sumA(ye),byType:byType(ye),donors,close:run,dl:yd,el:ye};
 }
 function typeTable(o){
 const k=Object.keys(o);
 return k.length?`<table><tr><th>نوع المصروف</th><th>المجموع</th></tr>${k.sort((a,b)=>o[b]-o[a]).map(t=>`<tr><td>${esc(t)}</td><td>${money(o[t])}</td></tr>`).join("")}</table>`:'<div class="empty">لا توجد مصاريف.</div>';
+}
+function occBreak(dl,el){
+const o={};
+const add=(x,f)=>{const k=x.occasionId||"";const r=o[k]=o[k]||{name:k?occName(k,x.occasionName):"بدون مناسبة",d:0,e:0};r[f]+=Number(x.amount)||0};
+dl.forEach(x=>add(x,"d"));el.forEach(x=>add(x,"e"));
+return o;
+}
+function occTable(o){
+const ks=Object.keys(o).filter(k=>k!=="").sort((a,b)=>o[a].name.localeCompare(o[b].name,"ar"));
+if(!ks.length)return '<div class="empty">لا توجد بيانات مسجّلة على مناسبات.</div>';
+if(o[""])ks.push("");
+return `<table><tr><th>المناسبة</th><th>التبرعات</th><th>المصاريف</th><th>الصافي</th></tr>${ks.map(k=>`<tr><td>${esc(o[k].name)}</td><td>${money(o[k].d)}</td><td>${money(o[k].e)}</td><td>${signed(o[k].d-o[k].e)}</td></tr>`).join("")}</table>`;
 }
 function renderMonthly(){
 const box=document.getElementById("finMonthlyBox");if(!box)return;
@@ -467,9 +505,10 @@ box.innerHTML=`<h3>التقرير الشهري — ${esc(monthLabel(ym))}</h3>
 <div class="stat"><strong>${money(r.don)}</strong><span>التبرعات</span></div>
 <div class="stat"><strong>${money(r.exp)}</strong><span>المصاريف</span></div>
 <div class="stat"><strong>${signed(r.close)}</strong><span>رصيد آخر الشهر</span></div></div>
-<h3>التبرعات</h3><div class="table-wrap">${r.dl.length?`<table><tr><th>التاريخ</th><th>المتبرع</th><th>المبلغ</th></tr>${r.dl.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.donorName)}</td><td>${money(x.amount)}</td></tr>`).join("")}<tr class="fin-total"><td colspan="2">المجموع</td><td>${money(r.don)}</td></tr></table>`:'<div class="empty">لا توجد تبرعات.</div>'}</div>
-<h3>المصاريف</h3><div class="table-wrap">${r.el.length?`<table><tr><th>التاريخ</th><th>النوع</th><th>التفاصيل</th><th>المبلغ</th></tr>${r.el.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.type)}</td><td>${esc(x.description||"")}</td><td>${money(x.amount)}</td></tr>`).join("")}<tr class="fin-total"><td colspan="3">المجموع</td><td>${money(r.exp)}</td></tr></table>`:'<div class="empty">لا توجد مصاريف.</div>'}</div>
-<h3>المصاريف حسب النوع</h3><div class="table-wrap">${typeTable(r.byType)}</div>`;
+<h3>التبرعات</h3><div class="table-wrap">${r.dl.length?`<table><tr><th>التاريخ</th><th>المتبرع</th><th>المناسبة</th><th>المبلغ</th><th>التفاصيل</th></tr>${r.dl.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.donorName)}</td><td>${esc(occOf(x))}</td><td>${money(x.amount)}</td><td>${esc(x.note||"")}</td></tr>`).join("")}<tr class="fin-total"><td colspan="3">المجموع</td><td colspan="2">${money(r.don)}</td></tr></table>`:'<div class="empty">لا توجد تبرعات.</div>'}</div>
+<h3>المصاريف</h3><div class="table-wrap">${r.el.length?`<table><tr><th>التاريخ</th><th>النوع</th><th>المناسبة</th><th>التفاصيل</th><th>المبلغ</th></tr>${r.el.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.type)}</td><td>${esc(occOf(x))}</td><td>${esc(x.description||"")}</td><td>${money(x.amount)}</td></tr>`).join("")}<tr class="fin-total"><td colspan="4">المجموع</td><td>${money(r.exp)}</td></tr></table>`:'<div class="empty">لا توجد مصاريف.</div>'}</div>
+<h3>المصاريف حسب النوع</h3><div class="table-wrap">${typeTable(r.byType)}</div>
+<h3>حسب المناسبة</h3><div class="table-wrap">${occTable(occBreak(r.dl,r.el))}</div>`;
 }
 function renderYearly(){
 const box=document.getElementById("finYearlyBox");if(!box)return;
@@ -483,17 +522,18 @@ box.innerHTML=`<h3>التقرير السنوي — ${esc(y)}</h3>
 <div class="stat"><strong>${signed(r.close)}</strong><span>رصيد آخر السنة</span></div></div>
 <h3>شهر بشهر</h3><div class="table-wrap"><table><tr><th>الشهر</th><th>التبرعات</th><th>المصاريف</th><th>الصافي</th><th>الرصيد</th></tr>${r.rows.map(x=>`<tr><td>${esc(monthLabel(x.ym))}</td><td>${money(x.d)}</td><td>${money(x.e)}</td><td>${signed(x.net)}</td><td>${signed(x.close)}</td></tr>`).join("")}<tr class="fin-total"><td>المجموع</td><td>${money(r.don)}</td><td>${money(r.exp)}</td><td>${signed(r.don-r.exp)}</td><td>${signed(r.close)}</td></tr></table></div>
 <h3>المصاريف حسب النوع</h3><div class="table-wrap">${typeTable(r.byType)}</div>
+<h3>حسب المناسبة</h3><div class="table-wrap">${occTable(occBreak(r.dl,r.el))}</div>
 <h3>المتبرعون</h3><div class="table-wrap">${names.length?`<table><tr><th>المتبرع</th><th>عدد الأشهر</th><th>المجموع</th></tr>${names.map(n=>`<tr><td>${esc(n)}</td><td>${r.donors[n].months.size}</td><td>${money(r.donors[n].total)}</td></tr>`).join("")}</table>`:'<div class="empty">لا توجد تبرعات.</div>'}</div>`;
 }
-function exportDonations(){csvDownload("التبرعات.csv",[["التاريخ","المتبرع","المبلغ","ملاحظة"],...fin.donations.slice().sort(byDateDesc).map(x=>[x.date,x.donorName,x.amount,x.note||""])])}
-function exportExpenses(){csvDownload("المصاريف.csv",[["التاريخ","النوع","التفاصيل","المبلغ"],...fin.expenses.slice().sort(byDateDesc).map(x=>[x.date,x.type,x.description||"",x.amount])])}
+function exportDonations(){csvDownload("التبرعات.csv",[["التاريخ","المتبرع","المناسبة","المبلغ","التفاصيل"],...fin.donations.slice().sort(byDateDesc).map(x=>[x.date,x.donorName,occOf(x),x.amount,x.note||""])])}
+function exportExpenses(){csvDownload("المصاريف.csv",[["التاريخ","النوع","المناسبة","التفاصيل","المبلغ"],...fin.expenses.slice().sort(byDateDesc).map(x=>[x.date,x.type,occOf(x),x.description||"",x.amount])])}
 function exportMonthly(){
 const ym=document.getElementById("finRepMonth").value||curMonth(),r=monthlyReport(ym);
-csvDownload("تقرير_"+ym+".csv",[["التقرير الشهري",monthLabel(ym)],["رصيد أول الشهر",r.open],["التبرعات",r.don],["المصاريف",r.exp],["رصيد آخر الشهر",r.close],[],["التبرعات"],["التاريخ","المتبرع","المبلغ"],...r.dl.map(x=>[x.date,x.donorName,x.amount]),[],["المصاريف"],["التاريخ","النوع","التفاصيل","المبلغ"],...r.el.map(x=>[x.date,x.type,x.description||"",x.amount])]);
+csvDownload("تقرير_"+ym+".csv",[["التقرير الشهري",monthLabel(ym)],["رصيد أول الشهر",r.open],["التبرعات",r.don],["المصاريف",r.exp],["رصيد آخر الشهر",r.close],[],["التبرعات"],["التاريخ","المتبرع","المناسبة","المبلغ","التفاصيل"],...r.dl.map(x=>[x.date,x.donorName,occOf(x),x.amount,x.note||""]),[],["المصاريف"],["التاريخ","النوع","المناسبة","التفاصيل","المبلغ"],...r.el.map(x=>[x.date,x.type,occOf(x),x.description||"",x.amount])]);
 }
 function exportYearly(){
 const y=String(document.getElementById("finRepYear").value||new Date().getFullYear()),r=yearlyReport(y);
-csvDownload("تقرير_سنة_"+y+".csv",[["التقرير السنوي",y],["رصيد أول السنة",r.open],[],["الشهر","التبرعات","المصاريف","الصافي","الرصيد"],...r.rows.map(x=>[monthLabel(x.ym),x.d,x.e,x.net,x.close]),[],["المصاريف حسب النوع"],...Object.entries(r.byType),[],["المتبرعون","عدد الأشهر","المجموع"],...Object.entries(r.donors).map(([n,o])=>[n,o.months.size,o.total])]);
+csvDownload("تقرير_سنة_"+y+".csv",[["التقرير السنوي",y],["رصيد أول السنة",r.open],[],["الشهر","التبرعات","المصاريف","الصافي","الرصيد"],...r.rows.map(x=>[monthLabel(x.ym),x.d,x.e,x.net,x.close]),[],["المصاريف حسب النوع"],...Object.entries(r.byType),[],["حسب المناسبة","التبرعات","المصاريف"],...Object.values(occBreak(r.dl,r.el)).map(o=>[o.name,o.d,o.e]),[],["المتبرعون","عدد الأشهر","المجموع"],...Object.entries(r.donors).map(([n,o])=>[n,o.months.size,o.total])]);
 }
 
 let RAW={},loaded={},listeners=[];
@@ -517,9 +557,9 @@ function startListeners(){
 RAW={};loaded={};firebaseReady=false;
 const T=String(currentRole.teamId);
 let paths;
-if(isTreasurer())paths=["settings","finance"];
+if(isTreasurer())paths=["settings","finance","occasions"];
 else{
-paths=["settings","teams"];
+paths=["settings","teams","occasions"];
 if(isAll())paths.push("members","workshops","attendance");
 else paths.push("members/"+T,"workshops/all","workshops/"+T,"attendance/"+T);
 if(isOwner())paths.push("finance");
@@ -551,6 +591,7 @@ donations:Object.entries(f.donations||{}).map(([id,x])=>({...x,id})),
 expenses:Object.entries(f.expenses||{}).map(([id,x])=>({...x,id})),
 meta:{currency:(f.meta&&f.meta.currency)||"$",opening:Number(f.meta&&f.meta.opening)||0}
 };
+occasions=Object.entries(RAW.occasions||{}).map(([id,o])=>({id,name:(o&&o.name)||"",created:(o&&o.created)||0})).sort((a,b)=>a.created-b.created);
 }
 function onRemote(paths){
 if(!paths.every(p=>loaded[p]))return;
@@ -577,7 +618,7 @@ currentRole=user?accountRoles[user.uid]||null:null;
 if(user&&!currentRole){auth.signOut();alert("هذا الحساب غير مخوّل للدخول إلى الموقع.");return}
 document.getElementById("loginScreen").style.display=user?"none":"flex";
 document.getElementById("loginPassword").value="";
-if(!user){data=normalizeData(null);fin={donations:[],expenses:[],meta:{currency:"$",opening:0}}}
+if(!user){data=normalizeData(null);occasions=[];fin={donations:[],expenses:[],meta:{currency:"$",opening:0}}}
 applyPermissionsUI();
 showPage(isTreasurer()?"finance":"home");
 if(user)startListeners();
@@ -672,6 +713,7 @@ else renderTeams();
 if(currentPage==="members"&&document.getElementById("generalMemberForm").classList.contains("hidden"))renderMembers();
 if(currentPage==="workshops"&&document.getElementById("workshopForm").classList.contains("hidden"))renderWorkshops();
 if(currentPage==="finance")renderFinance();
+if(currentPage==="settings")renderOccasions();
 }
 
 function ageFromDate(date){
@@ -1042,6 +1084,7 @@ return `<h3>${w.id?"تعديل الورشة أو النشاط":"إنشاء ور�
 <label>الفرقة<select id="editWorkshopTeam">${isAll()?`<option value="all" ${w.teamId==="all"?"selected":""}>جميع الفرق</option>`:""}${teamOptions(w.teamId)}</select></label>
 <label>التاريخ<input type="date" id="editWorkshopDate" value="${esc(w.date||"")}"></label>
 <label>الوقت<input type="time" id="editWorkshopTime" value="${esc(w.time||"")}"></label>
+<label>المناسبة<select id="editWorkshopOccasion"><option value="">بدون مناسبة</option>${occasions.map(o=>`<option value="${o.id}" ${w.occasionId===o.id?"selected":""}>${esc(o.name)}</option>`).join("")}</select></label>
 <label>المكان<input id="editWorkshopPlace" value="${esc(w.place||"")}" placeholder="مكان النشاط"></label>
 <label>التفاصيل<textarea id="editWorkshopDesc" rows="3">${esc(w.description||"")}</textarea></label>
 <div class="toolbar"><button class="action" onclick="saveWorkshop('${w.id||""}')">حفظ ${w.id?"التعديلات":"النشاط"}</button><button class="secondary" onclick="cancelWorkshopForm()">إلغاء</button></div>`;
@@ -1058,7 +1101,7 @@ if(!name){alert("اكتب اسم النشاط.");return}
 let teamId=document.getElementById("editWorkshopTeam").value,t=data.teams.find(x=>x.id===teamId);
 if(teamId!=="all"&&!canTeam(teamId)){alert("ليس لديك صلاحية لهذه الفرقة.");return}
 if(teamId==="all"&&!isAll()){alert("ليس لديك صلاحية لجميع الفرق.");return}
-let values={name,teamId,teamName:t?.name||"جميع الفرق",date:document.getElementById("editWorkshopDate").value,time:document.getElementById("editWorkshopTime").value,place:document.getElementById("editWorkshopPlace").value.trim(),description:document.getElementById("editWorkshopDesc").value.trim()};
+let values={name,teamId,teamName:t?.name||"جميع الفرق",date:document.getElementById("editWorkshopDate").value,time:document.getElementById("editWorkshopTime").value,place:document.getElementById("editWorkshopPlace").value.trim(),description:document.getElementById("editWorkshopDesc").value.trim(),...occPick("editWorkshopOccasion")};
 if(id){let w=data.workshops.find(x=>x.id===id);if(!w||!canWorkshop(w))return;Object.assign(w,values)}
 else data.workshops.push({id:uid(),...values});
 saveData();cancelWorkshopForm();renderWorkshops();
@@ -1067,7 +1110,7 @@ function renderWorkshops(){
 const ws=vw();
 document.getElementById("workshopsList").innerHTML=ws.length?ws.slice().reverse().map(w=>`
 <div class="team-card">
-<div class="row-between"><strong>${esc(w.name)}</strong><span class="tag">${esc(w.teamName)}</span></div>
+<div class="row-between"><strong>${esc(w.name)}</strong><span><span class="tag">${esc(w.teamName)}</span> ${w.occasionId?`<span class="tag">🎯 ${esc(occOf(w))}</span>`:""}</span></div>
 <p>📅 ${esc(w.date||"غير محدد")}　🕒 ${esc(w.time||"غير محدد")}　📍 ${esc(w.place||"غير محدد")}</p>
 <p>${esc(w.description||"")}</p>
 <div class="toolbar">${canWorkshop(w)?`<button class="secondary" onclick="editWorkshop('${w.id}')">تعديل</button>`:""}<button class="secondary" onclick="goToAttendance('${w.id}')">تسجيل الحضور</button>${canWorkshop(w)?`<button class="danger" onclick="deleteWorkshop('${w.id}')">حذف</button>`:""}</div>
@@ -1143,7 +1186,32 @@ if(m&&canTeam(m.teamId))rows.push([w.name,m.name,m.teamName,s]);
 });
 csvDownload("حضور_الفوج.csv",rows);
 }
+function renderOccasions(){
+const el=document.getElementById("occList");if(!el)return;
+el.innerHTML=occasions.length?occasions.map(o=>`<div class="team-card"><div class="row-between"><strong>🎯 ${esc(o.name)}</strong><span><button class="secondary" onclick="renameOccasion('${o.id}')">تعديل</button> <button class="danger" onclick="deleteOccasion('${o.id}')">حذف</button></span></div></div>`).join(""):'<div class="empty">لا توجد مناسبات بعد. أضف أول مناسبة.</div>';
+}
+function addOccasion(){
+if(!isOwner())return;
+const inp=document.getElementById("newOccName"),n=inp.value.trim();
+if(!n){alert("اكتب اسم المناسبة.");return}
+if(occasions.some(o=>o.name===n)){alert("هالمناسبة موجودة.");return}
+db.ref("occasions/"+uid()).set({name:n,created:Date.now()}).then(()=>{inp.value=""}).catch(e=>{console.error(e);alert("تعذّر الحفظ.")});
+}
+function renameOccasion(id){
+if(!isOwner())return;
+const o=occasions.find(x=>x.id===id);if(!o)return;
+const n=prompt("اسم المناسبة:",o.name);
+if(!n||!n.trim())return;
+db.ref("occasions/"+id+"/name").set(n.trim()).catch(e=>{console.error(e);alert("تعذّر الحفظ.")});
+}
+function deleteOccasion(id){
+if(!isOwner())return;
+const o=occasions.find(x=>x.id===id);if(!o)return;
+if(!confirm("حذف المناسبة «"+o.name+"»؟ التبرعات والمصاريف والأنشطة المسجّلة عليها بتضل محفوظة باسمها."))return;
+db.ref("occasions/"+id).remove().catch(e=>{console.error(e);alert("تعذّر الحذف.")});
+}
 function loadSettings(){
+renderOccasions();
 document.getElementById("settingTitle").value=data.settings.title;
 document.getElementById("settingBlue").value=data.settings.blue;
 document.getElementById("settingNavy").value=data.settings.navy;
