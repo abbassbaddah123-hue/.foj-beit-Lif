@@ -83,13 +83,55 @@ th{background:var(--light);color:var(--navy)}.table-wrap{overflow-x:auto}
 .history-item{border-right:3px solid var(--blue);background:#f5f9ff;padding:11px;margin:9px 0;border-radius:8px;font-size:13px}
 
 @media(min-width:700px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-
+#loginScreen{
+position:fixed;inset:0;z-index:99999;
+background:#f3f7fc;display:flex;
+align-items:center;justify-content:center;padding:20px
+}
+.login-card{
+background:white;width:100%;max-width:390px;
+padding:25px;border-radius:18px;
+box-shadow:0 5px 25px #082b5520
+}
+.login-card h2{text-align:center}
+.login-card .action{width:100%;margin-top:10px}
+#loginError{color:#b42318;font-size:13px;margin-top:10px}
 </style>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 </head>
-
+  
 <body>
+<div id="loginScreen">
 
+  <div class="login-card">
+
+    <h2>⚜️ فوج الإمام الهادي (ع)</h2>
+
+    <p style="text-align:center">بيت ليف – تسجيل الدخول</p>
+
+    <label>اسم المستخدم
+
+      <input id="loginUsername" placeholder="أدخل اسم المستخدم" autocomplete="username">
+
+    </label>
+
+    <label>كلمة المرور
+
+      <input id="loginPassword" type="password" placeholder="كلمة المرور" autocomplete="current-password">
+
+    </label>
+
+    <button class="action" onclick="loginUser()">دخول</button>
+
+    <div id="loginError"></div>
+
+  </div>
+
+</div>
 <header>
 
 <div class="header-inner">
@@ -297,9 +339,87 @@ th{background:var(--light);color:var(--navy)}.table-wrap{overflow-x:auto}
 </main>
 
 <footer>فوج الإمام الهادي (ع) – بيت ليف</footer>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
+  // Firebase connection
+const firebaseConfig = {
+  apiKey: "AIzaSyC3McwmwHH_JyPX4bdD_KO6Zkh0Z2pDeSA",
+  authDomain: "fwjbetlif.firebaseapp.com",
+  databaseURL: "https://fwjbetlif-default-rtdb.firebaseio.com",
+  projectId: "fwjbetlif",
+  storageBucket: "fwjbetlif.firebasestorage.app",
+  messagingSenderId: "810985450426",
+  appId: "1:810985450426:web:2eef73bfc0e70fcbbf8b83",
+  measurementId: "G-YKX4RV19QZ"
+};
 
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+const auth = firebase.auth();
+const db = firebase.database();
+
+let currentUser = null;
+let currentRole = null;
+let firebaseReady = false;
+  const loginAccounts = {
+  "3amedfouj": "abbassbaddah123@gmail.com",
+  "ka2ed2shbal": "ka2ed2shbal@fwjbetlif.com",
+  "ka2edkshafe": "ka2edkshafe@fwjbetlif.com",
+  "ka2edbra3m": "ka2edbra3m@fwjbetlif.com",
+  "ka2edjawli": "ka2edjawli@fwjbetlif.com",
+  "ka2ed5dmi": "ka2ed5dmi@fwjbetlif.com",
+  "ka2edskafe": "ka2edskafe@fwjbetlif.com"
+};
+
+const accountRoles = {
+  "kFXfcTCjqqPbWn9hqG4WS8YF1s72": {role:"owner",teamId:"all"},
+  "QQTrk9CbCXWfGwPP5QXGTtjX3AB2": {role:"culture",teamId:"all"},
+  "2EvsrNPhx3PxW8g8hO6WF7q9aTD2": {role:"leader",teamId:"3"},
+  "UVx26n5uiUP5IrR2NNA0TFEzfPD2": {role:"leader",teamId:"1"},
+  "HfTtVYPfgDeCAquhFdS8dtbl1yC2": {role:"leader",teamId:"4"},
+  "bqaGGFvPbJZlfzCFEhxn92AQcrx1": {role:"leader",teamId:"5"},
+  "2Sr9RB0y08TA8odQrSf9ALfdF5t2": {role:"leader",teamId:"2"}
+};
+
+async function loginUser(){
+  const username = document.getElementById("loginUsername").value.trim().toLowerCase();
+  const password = document.getElementById("loginPassword").value;
+  const error = document.getElementById("loginError");
+  error.textContent = "";
+
+  const email = loginAccounts[username];
+
+  if(!email || !password){
+    error.textContent = "تأكد من اسم المستخدم وكلمة المرور.";
+    return;
+  }
+
+  try{
+    await auth.signInWithEmailAndPassword(email,password);
+  }catch(e){
+    error.textContent = "تعذّر تسجيل الدخول. تأكد من المعلومات.";
+  }
+}
+
+auth.onAuthStateChanged(user=>{
+  currentUser = user;
+  currentRole = user ? accountRoles[user.uid] || null : null;
+
+  if(user && !currentRole){
+    auth.signOut();
+    alert("هذا الحساب غير مخوّل للدخول إلى الموقع.");
+    return;
+  }
+
+  document.getElementById("loginScreen").style.display =
+    user ? "none" : "flex";
+});
 const defaultTeams=[
 
 {id:"1",name:"فرقة البراعم",type:"none"},
@@ -389,13 +509,20 @@ let selectedTeam=null,selectedGroup=null,attendanceDraft={};
 let editingMemberId=null,memberReturn="members";
 
 function saveData(){
+  try {
+    localStorage.setItem("beitlif_data", JSON.stringify(data));
+  } catch(e) {
+    console.warn("تعذّر حفظ البيانات محلياً", e);
+  }
 
-try{localStorage.setItem("beitlif_data",JSON.stringify(data))}
+  updateDashboard();
 
-catch(e){console.warn("تعذّر حفظ البيانات",e)}
-
-updateDashboard();
-
+  if (currentUser && firebaseReady) {
+    db.ref("appData").set(data).catch(error => {
+      console.error("Firebase save error:", error);
+      alert("تعذّر حفظ البيانات على الخادم.");
+    });
+  }
 }
 
 function ageFromDate(date){
