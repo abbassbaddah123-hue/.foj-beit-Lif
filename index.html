@@ -223,7 +223,7 @@ error.textContent="";
 const email=loginAccounts[username];
 if(!email||!password){error.textContent="تأكد من اسم المستخدم وكلمة المرور.";return}
 try{await auth.signInWithEmailAndPassword(email,password)}
-catch(e){error.textContent="تعذّر تسجيل الدخول. تأكد من المعلومات."}
+catch(e){error.textContent="تعذّر تسجيل الدخول. تأكد من المعلومات. ("+(e.code||"خطأ")+")"}
 }
 function logoutUser(){auth.signOut()}
 
