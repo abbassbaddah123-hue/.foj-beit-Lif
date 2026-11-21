@@ -97,7 +97,7 @@ th{background:var(--light);color:var(--navy)}.table-wrap{overflow-x:auto}
 </div>
 <div class="panel hidden" id="teamDetails">
 <button class="secondary" onclick="closeTeam()">← رجوع إلى الفرق</button>
-<div class="row-between"><h2 id="teamDetailsTitle"></h2><button class="secondary" onclick="renameSelectedTeam()">تعديل اسم الفرقة</button></div>
+<div class="row-between"><h2 id="teamDetailsTitle"></h2><button class="secondary" id="renameTeamBtn" onclick="renameSelectedTeam()">تعديل اسم الفرقة</button></div>
 <div id="groupManagement"></div>
 <div class="toolbar"><button class="action" onclick="showMemberForm()">+ إضافة عنصر إلى الفرقة</button></div>
 <div id="teamMemberForm" class="form-box hidden"></div>
@@ -120,7 +120,7 @@ th{background:var(--light);color:var(--navy)}.table-wrap{overflow-x:auto}
 </section>
 <section id="members" class="page hidden">
 <div class="panel">
-<div class="row-between"><h2>إدارة العناصر</h2><button class="action" onclick="showGeneralMemberForm()">+ إضافة عنصر</button></div>
+<div class="row-between"><h2>إدارة العناصر</h2><button class="action" id="generalAddBtn" onclick="showGeneralMemberForm()">+ إضافة عنصر</button></div>
 <div id="generalMemberForm" class="form-box hidden"></div>
 <label>البحث عن عنصر<input id="memberSearch" placeholder="اكتب اسم العنصر..." oninput="renderMembers()"></label>
 <div class="table-wrap" id="membersTable"></div>
@@ -210,6 +210,9 @@ function canTeam(id){return isAll()||(!!currentRole&&String(currentRole.teamId)=
 function vt(){return data.teams.filter(t=>canTeam(t.id))}
 function vm(){return data.members.filter(m=>canTeam(m.teamId))}
 function vw(){return data.workshops.filter(w=>w.teamId==="all"||canTeam(w.teamId))}
+function isCulture(){return !!currentRole&&currentRole.role==="culture"}
+function canEdit(tid){return isOwner()||(!!currentRole&&currentRole.role==="leader"&&String(currentRole.teamId)===String(tid))}
+function canWorkshop(w){return isAll()||(!!currentRole&&String(w.teamId)===String(currentRole.teamId))}
 
 async function loginUser(){
 const username=document.getElementById("loginUsername").value.trim().toLowerCase();
@@ -223,28 +226,74 @@ catch(e){error.textContent="تعذّر تسجيل الدخول. تأكد من ا
 }
 function logoutUser(){auth.signOut()}
 
+let RAW={},loaded={},listeners=[];
+function stopListeners(){listeners.forEach(l=>l.ref.off("value",l.cb));listeners=[]}
+function applyPermissionsUI(){
+document.getElementById("logoutBtn").classList.toggle("hidden",!currentUser);
+const navBtn=p=>document.querySelector('nav button[data-page="'+p+'"]');
+navBtn("settings").classList.toggle("hidden",!isOwner());
+navBtn("teams").classList.toggle("hidden",isCulture());
+document.getElementById("addTeamBtn").classList.toggle("hidden",!isOwner());
+document.getElementById("renameTeamBtn").classList.toggle("hidden",!isOwner());
+document.getElementById("generalAddBtn").classList.toggle("hidden",isCulture());
+}
+function startListeners(){
+RAW={};loaded={};firebaseReady=false;
+const T=String(currentRole.teamId);
+const paths=["settings","teams"];
+if(isAll())paths.push("members","workshops","attendance");
+else paths.push("members/"+T,"workshops/all","workshops/"+T,"attendance/"+T);
+paths.forEach(p=>{
+const ref=db.ref(p);
+const cb=snap=>{RAW[p]=snap.val();loaded[p]=true;onRemote(paths)};
+ref.on("value",cb,e=>{console.error("Firebase read error:",p,e);alert("تعذّر قراءة البيانات من الخادم. تأكد من قواعد Firebase.")});
+listeners.push({ref,cb});
+});
+}
+function grp(base){
+const map={};
+if(RAW[base]&&typeof RAW[base]==="object")Object.assign(map,RAW[base]);
+Object.keys(RAW).forEach(k=>{if(k.startsWith(base+"/"))map[k.slice(base.length+1)]=RAW[k]});
+return map;
+}
+function rebuild(){
+const teams=Object.entries(RAW.teams||{}).map(([id,t])=>({...t,id}));
+const members=[],workshops=[],att={};
+Object.entries(grp("members")).forEach(([tid,o])=>Object.entries(o||{}).forEach(([id,m])=>members.push({...m,id,teamId:tid})));
+Object.entries(grp("workshops")).forEach(([tid,o])=>Object.entries(o||{}).forEach(([id,w])=>workshops.push({...w,id,teamId:tid})));
+Object.entries(grp("attendance")).forEach(([tid,o])=>Object.entries(o||{}).forEach(([wid,r])=>{att[wid]=Object.assign(att[wid]||{},r||{})}));
+const attendance=Object.entries(att).map(([wid,records])=>({id:wid,workshopId:wid,records}));
+data=normalizeData({settings:RAW.settings,teams,members,workshops,attendance});
+}
+function onRemote(paths){
+if(!paths.every(p=>loaded[p]))return;
+rebuild();
+if(!firebaseReady){
+firebaseReady=true;
+if(isOwner()&&RAW.teams==null){migrateOld();return}
+}
+applySettings();refreshView();
+}
+async function migrateOld(){
+const cands=[];
+const loc=loadData();
+if(loc)cands.push(normalizeData(loc));
+try{const s=await db.ref("appData").once("value");if(s.val())cands.push(normalizeData(s.val()))}catch(e){}
+if(cands.length){cands.sort((a,b)=>b.members.length-a.members.length);data=cands[0]}
+saveData();applySettings();refreshView();
+}
 auth.onAuthStateChanged(user=>{
-if(dataRef){dataRef.off();dataRef=null}
+stopListeners();
 firebaseReady=false;
 currentUser=user;
 currentRole=user?accountRoles[user.uid]||null:null;
 if(user&&!currentRole){auth.signOut();alert("هذا الحساب غير مخوّل للدخول إلى الموقع.");return}
 document.getElementById("loginScreen").style.display=user?"none":"flex";
-document.getElementById("logoutBtn").classList.toggle("hidden",!user);
 document.getElementById("loginPassword").value="";
-document.querySelector('nav button[data-page="settings"]').classList.toggle("hidden",!isOwner());
-document.getElementById("addTeamBtn").classList.toggle("hidden",!isOwner());
-if(!user){showPage("home");return}
-dataRef=db.ref("appData");
-dataRef.on("value",snap=>{
-const remote=snap.val();
-if(remote){data=normalizeData(remote);try{localStorage.setItem("beitlif_data",JSON.stringify(data))}catch(e){}}
-else{data=normalizeData(data)}
-firebaseReady=true;
-if(!remote)dataRef.set(data).catch(e=>console.error(e));
-applySettings();refreshView();
-},err=>{console.error("Firebase read error:",err);alert("تعذّر قراءة البيانات من الخادم. تأكد من قواعد Firebase.");refreshView()});
+if(!user)data=normalizeData(null);
+applyPermissionsUI();
 showPage("home");
+if(user)startListeners();
 });
 
 const defaultTeams=[
@@ -285,24 +334,47 @@ d.workshops=d.workshops.filter(w=>w&&typeof w==="object").map(w=>({...w,id:Strin
 d.attendance=d.attendance.filter(a=>a&&typeof a==="object").map(a=>({...a,workshopId:String(a.workshopId||""),records:a.records&&typeof a.records==="object"?a.records:{}}));
 return d;
 }
-let data=normalizeData(loadData());
+let data=normalizeData(null);
 let selectedTeam=null,selectedGroup=null,attendanceDraft={};
 let editingMemberId=null,memberReturn="members";
 
+function buildUpdates(){
+const u={},T=String(currentRole.teamId),all=isAll(),owner=isOwner();
+const clean=x=>JSON.parse(JSON.stringify(x));
+const teamIds=data.teams.map(t=>t.id);
+if(owner)u["settings"]=clean(data.settings);
+if(owner)data.teams.forEach(t=>{u["teams/"+t.id]=clean({name:t.name,type:t.type,groups:t.groups||[]})});
+else if(currentRole.role==="leader"){const t=data.teams.find(x=>x.id===T);if(t)u["teams/"+T+"/groups"]=(t.groups&&t.groups.length)?clean(t.groups):null}
+const mT=owner?teamIds:(currentRole.role==="leader"?[T]:[]);
+mT.forEach(tid=>{const o={};data.members.filter(m=>m.teamId===tid).forEach(m=>{o[m.id]=clean(m)});u["members/"+tid]=Object.keys(o).length?o:null});
+const wT=all?["all",...teamIds]:[T];
+wT.forEach(tid=>{const o={};data.workshops.filter(w=>w.teamId===tid).forEach(w=>{o[w.id]=clean(w)});u["workshops/"+tid]=Object.keys(o).length?o:null});
+const aT=all?teamIds:[T];
+const att={};aT.forEach(t=>att[t]={});
+data.attendance.forEach(a=>{
+if(!data.workshops.some(w=>w.id===a.workshopId))return;
+Object.entries(a.records||{}).forEach(([mid,st])=>{
+const m=data.members.find(x=>x.id===mid);
+if(!m||!att[m.teamId])return;
+(att[m.teamId][a.workshopId]=att[m.teamId][a.workshopId]||{})[mid]=st;
+});
+});
+aT.forEach(t=>{u["attendance/"+t]=Object.keys(att[t]).length?att[t]:null});
+return u;
+}
 function saveData(){
-try{localStorage.setItem("beitlif_data",JSON.stringify(data))}catch(e){console.warn("تعذّر حفظ البيانات محلياً",e)}
+if(isOwner()){try{localStorage.setItem("beitlif_data",JSON.stringify(data))}catch(e){}}
 updateDashboard();
-if(currentUser&&firebaseReady){
-db.ref("appData").set(data).catch(error=>{console.error("Firebase save error:",error);alert("تعذّر حفظ البيانات على الخادم.")});
+if(currentUser&&currentRole&&firebaseReady){
+db.ref().update(buildUpdates()).catch(error=>{console.error("Firebase save error:",error);alert("تعذّر حفظ البيانات على الخادم (قد لا تملك صلاحية لهذا التعديل).")});
 }
 }
-
-/* إعادة رسم الصفحة الحالية عند وصول بيانات جديدة */
 function refreshView(){
 updateDashboard();
+if(selectedTeam)selectedTeam=data.teams.find(t=>t.id===selectedTeam.id)||null;
+if(selectedGroup)selectedGroup=selectedTeam?selectedTeam.groups.find(g=>g.id===selectedGroup.id)||null:null;
 if(currentPage==="teams"){
-if(selectedTeam){selectedTeam=data.teams.find(t=>t.id===selectedTeam.id)||null;
-if(selectedTeam&&canTeam(selectedTeam.id)&&document.getElementById("teamMemberForm").classList.contains("hidden"))renderTeamDetails()}
+if(selectedTeam){if(canTeam(selectedTeam.id)&&document.getElementById("teamMemberForm").classList.contains("hidden"))renderTeamDetails()}
 else renderTeams();
 }
 if(currentPage==="members"&&document.getElementById("generalMemberForm").classList.contains("hidden"))renderMembers();
@@ -369,6 +441,7 @@ saveData();renderTeams();
 }
 function openTeam(id){
 if(!canTeam(id)){alert("ليس لديك صلاحية لهذه الفرقة.");return}
+if(!canEdit(id)){const tt=data.teams.find(x=>String(x.id)===String(id));showPage("members");document.getElementById("memberSearch").value=tt?tt.name:"";renderMembers();return}
 selectedTeam=data.teams.find(t=>String(t.id)===String(id));
 if(!selectedTeam){alert("لم يتم العثور على الفرقة.");return}
 selectedGroup=null;currentPage="teams";
@@ -387,7 +460,7 @@ document.getElementById("teamsPanel").classList.remove("hidden");
 renderTeams();
 }
 function renameSelectedTeam(){
-if(!selectedTeam)return;
+if(!selectedTeam||!isOwner())return;
 let n=prompt("اسم الفرقة:",selectedTeam.name);
 if(!n?.trim())return;
 selectedTeam.name=n.trim();
@@ -401,7 +474,7 @@ return i>=0&&i<3?data.teams.find(x=>x.id===order[i+1]):null;
 }
 function promoteMember(id){
 const m=data.members.find(x=>x.id===String(id));
-if(!m||!canTeam(m.teamId))return;
+if(!m||!canEdit(m.teamId))return;
 const current=data.teams.find(t=>t.id===m.teamId);
 if(!current)return;
 const next=nextTeamFor(current);
@@ -415,9 +488,10 @@ renderMembers();
 alert(`تم نقل ${m.name} إلى ${next.name} بنجاح.`);
 }
 function memberActions(m){
+if(!canEdit(m.teamId))return "";
 const t=data.teams.find(x=>x.id===m.teamId),next=t?nextTeamFor(t):null;
-return `<button class="secondary" onclick="editMember('${m.id}')">تعديل / نقل</button>
-${next?`<button class="action" onclick="promoteMember('${m.id}')">ترفيع إلى ${esc(next.name.replace("فرقة ",""))}</button>`:""}
+return `<button class="secondary" onclick="editMember('${m.id}')">تعديل${isOwner()?" / نقل":""}</button>
+${next&&isOwner()?`<button class="action" onclick="promoteMember('${m.id}')">ترفيع إلى ${esc(next.name.replace("فرقة ",""))}</button>`:""}
 <button class="danger" onclick="deleteMember('${m.id}')">حذف</button>`;
 }
 function renderTeamDetails(){
@@ -603,7 +677,7 @@ return `<tr><td>${esc(m.name)}</td><td>${esc(m.teamName)}</td><td>${esc(ageFromD
 }
 function editMember(id){
 let m=data.members.find(x=>x.id===String(id));
-if(!m||!canTeam(m.teamId))return;
+if(!m||!canEdit(m.teamId))return;
 editingMemberId=m.id;
 if(selectedGroup)memberReturn="group";
 else if(selectedTeam)memberReturn="team";
@@ -656,7 +730,7 @@ window.scrollTo(0,0);
 }
 function deleteMember(id){
 let m=data.members.find(x=>x.id===id);
-if(!m||!canTeam(m.teamId))return;
+if(!m||!canEdit(m.teamId))return;
 if(!confirm("هل تريد حذف هذا العنصر؟"))return;
 data.members=data.members.filter(x=>x.id!==id);
 data.attendance.forEach(a=>{if(a.records)delete a.records[id]});
@@ -689,7 +763,7 @@ let teamId=document.getElementById("editWorkshopTeam").value,t=data.teams.find(x
 if(teamId!=="all"&&!canTeam(teamId)){alert("ليس لديك صلاحية لهذه الفرقة.");return}
 if(teamId==="all"&&!isAll()){alert("ليس لديك صلاحية لجميع الفرق.");return}
 let values={name,teamId,teamName:t?.name||"جميع الفرق",date:document.getElementById("editWorkshopDate").value,time:document.getElementById("editWorkshopTime").value,place:document.getElementById("editWorkshopPlace").value.trim(),description:document.getElementById("editWorkshopDesc").value.trim()};
-if(id){let w=data.workshops.find(x=>x.id===id);if(!w)return;Object.assign(w,values)}
+if(id){let w=data.workshops.find(x=>x.id===id);if(!w||!canWorkshop(w))return;Object.assign(w,values)}
 else data.workshops.push({id:uid(),...values});
 saveData();cancelWorkshopForm();renderWorkshops();
 }
@@ -700,7 +774,7 @@ document.getElementById("workshopsList").innerHTML=ws.length?ws.slice().reverse(
 <div class="row-between"><strong>${esc(w.name)}</strong><span class="tag">${esc(w.teamName)}</span></div>
 <p>📅 ${esc(w.date||"غير محدد")}　🕒 ${esc(w.time||"غير محدد")}　📍 ${esc(w.place||"غير محدد")}</p>
 <p>${esc(w.description||"")}</p>
-<div class="toolbar"><button class="secondary" onclick="editWorkshop('${w.id}')">تعديل</button><button class="secondary" onclick="goToAttendance('${w.id}')">تسجيل الحضور</button><button class="danger" onclick="deleteWorkshop('${w.id}')">حذف</button></div>
+<div class="toolbar">${canWorkshop(w)?`<button class="secondary" onclick="editWorkshop('${w.id}')">تعديل</button>`:""}<button class="secondary" onclick="goToAttendance('${w.id}')">تسجيل الحضور</button>${canWorkshop(w)?`<button class="danger" onclick="deleteWorkshop('${w.id}')">حذف</button>`:""}</div>
 </div>`).join(""):'<div class="empty">لا توجد ورش أو أنشطة بعد.</div>';
 }
 function editWorkshop(id){
@@ -712,7 +786,7 @@ f.scrollIntoView({behavior:"smooth",block:"start"});
 }
 function deleteWorkshop(id){
 let w=data.workshops.find(x=>x.id===id);
-if(!w||(w.teamId==="all"&&!isAll()))return;
+if(!w||!canWorkshop(w))return;
 if(!confirm("حذف النشاط؟ سيتم حذف سجل حضوره أيضاً."))return;
 data.workshops=data.workshops.filter(x=>x.id!==id);
 data.attendance=data.attendance.filter(a=>a.workshopId!==id);
