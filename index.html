@@ -1195,20 +1195,20 @@ if(!isOwner())return;
 const inp=document.getElementById("newOccName"),n=inp.value.trim();
 if(!n){alert("اكتب اسم المناسبة.");return}
 if(occasions.some(o=>o.name===n)){alert("هالمناسبة موجودة.");return}
-db.ref("occasions/"+uid()).set({name:n,created:Date.now()}).then(()=>{inp.value=""}).catch(e=>{console.error(e);alert("تعذّر الحفظ.")});
+db.ref("occasions/"+uid()).set({name:n,created:Date.now()}).then(()=>{inp.value=""}).catch(e=>{console.error(e);alert("تعذّر الحفظ ("+(e.code||e.message)+")")});
 }
 function renameOccasion(id){
 if(!isOwner())return;
 const o=occasions.find(x=>x.id===id);if(!o)return;
 const n=prompt("اسم المناسبة:",o.name);
 if(!n||!n.trim())return;
-db.ref("occasions/"+id+"/name").set(n.trim()).catch(e=>{console.error(e);alert("تعذّر الحفظ.")});
+db.ref("occasions/"+id+"/name").set(n.trim()).catch(e=>{console.error(e);alert("تعذّر الحفظ ("+(e.code||e.message)+")")});
 }
 function deleteOccasion(id){
 if(!isOwner())return;
 const o=occasions.find(x=>x.id===id);if(!o)return;
 if(!confirm("حذف المناسبة «"+o.name+"»؟ التبرعات والمصاريف والأنشطة المسجّلة عليها بتضل محفوظة باسمها."))return;
-db.ref("occasions/"+id).remove().catch(e=>{console.error(e);alert("تعذّر الحذف.")});
+db.ref("occasions/"+id).remove().catch(e=>{console.error(e);alert("تعذّر الحذف ("+(e.code||e.message)+")")});
 }
 function loadSettings(){
 renderOccasions();
