@@ -46,6 +46,8 @@ th{background:var(--light);color:var(--navy)}.table-wrap{overflow-x:auto}
 .pos{color:#067647;font-weight:bold}.neg{color:#b42318;font-weight:bold}
 .fin-total td{background:var(--light);font-weight:bold}
 .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 10px}
+.form-grid>label{min-width:0}
+input[type=date],input[type=month],input[type=time]{-webkit-appearance:none;appearance:none;min-width:0;max-width:100%;min-height:46px;text-align:right;display:block}
 @media print{header,nav,footer,.no-print,#loginScreen{display:none!important}body{background:white}.panel{box-shadow:none;border:0}main{margin:0}}
 @media(min-width:700px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 #loginScreen{position:fixed;inset:0;z-index:99999;background:#f3f7fc;display:flex;align-items:center;justify-content:center;padding:20px}
@@ -143,7 +145,7 @@ th{background:var(--light);color:var(--navy)}.table-wrap{overflow-x:auto}
 </section>
 <section id="workshops" class="page hidden">
 <div class="panel">
-<div class="row-between"><h2>الورش والأنشطة</h2><button class="action" onclick="showWorkshopForm()">+ إنشاء ورشة / نشاط</button></div>
+<div class="row-between"><h2>الورش والأنشطة</h2><button class="secondary owner-only hidden" onclick="quickAddOccasion()">+ إضافة مناسبة</button><button class="action" onclick="showWorkshopForm()">+ إنشاء ورشة / نشاط</button></div>
 <div id="workshopForm" class="form-box hidden"></div>
 <div id="workshopsList"></div>
 </div>
@@ -159,6 +161,7 @@ th{background:var(--light);color:var(--navy)}.table-wrap{overflow-x:auto}
 <section id="finance" class="page hidden">
 <div class="panel">
 <div class="row-between"><h2>💰 مالية الفوج</h2>
+<button class="action owner-only hidden no-print" onclick="quickAddOccasion()">+ إضافة مناسبة</button>
 <label class="no-print" style="margin:0;min-width:130px">العملة<select id="finCurrency" onchange="saveFinCurrency()"><option value="$">دولار ($)</option><option value="ل.ل">ليرة (ل.ل)</option></select></label></div>
 <div class="fin-tabs no-print">
 <button data-fin="summary" onclick="showFinTab('summary')">الملخص</button>
@@ -552,6 +555,7 @@ b.classList.toggle("hidden",hide);
 document.getElementById("addTeamBtn").classList.toggle("hidden",!isOwner());
 document.getElementById("renameTeamBtn").classList.toggle("hidden",!isOwner());
 document.getElementById("generalAddBtn").classList.toggle("hidden",isCulture());
+document.querySelectorAll(".owner-only").forEach(e=>e.classList.toggle("hidden",!isOwner()));
 }
 function startListeners(){
 RAW={};loaded={};firebaseReady=false;
@@ -1196,6 +1200,13 @@ const inp=document.getElementById("newOccName"),n=inp.value.trim();
 if(!n){alert("اكتب اسم المناسبة.");return}
 if(occasions.some(o=>o.name===n)){alert("هالمناسبة موجودة.");return}
 db.ref("occasions/"+uid()).set({name:n,created:Date.now()}).then(()=>{inp.value=""}).catch(e=>{console.error(e);alert("تعذّر الحفظ ("+(e.code||e.message)+")")});
+}
+function quickAddOccasion(){
+if(!isOwner())return;
+const n=(prompt("اسم المناسبة الجديدة:")||"").trim();
+if(!n)return;
+if(occasions.some(o=>o.name===n)){alert("هالمناسبة موجودة.");return}
+db.ref("occasions/"+uid()).set({name:n,created:Date.now()}).then(()=>alert("تمت إضافة المناسبة «"+n+"». صارت بتظهر لباقي الحسابات.")).catch(e=>{console.error(e);alert("تعذّر الحفظ ("+(e.code||e.message)+")")});
 }
 function renameOccasion(id){
 if(!isOwner())return;
