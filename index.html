@@ -129,8 +129,9 @@ input[type=date],input[type=month],input[type=time]{-webkit-appearance:none;appe
 </section>
 <section id="members" class="page hidden">
 <div class="panel">
-<div class="row-between"><h2>إدارة العناصر</h2><button class="action" id="generalAddBtn" onclick="showGeneralMemberForm()">+ إضافة عنصر</button></div>
+<div class="row-between"><h2>إدارة العناصر</h2><span><button class="secondary" id="bulkAddBtn" onclick="showBulkForm()">+ إضافة بالأرقام</button> <button class="action" id="generalAddBtn" onclick="showGeneralMemberForm()">+ إضافة عنصر</button></span></div>
 <div id="generalMemberForm" class="form-box hidden"></div>
+<div id="bulkForm" class="form-box hidden"></div>
 <label>البحث عن عنصر<input id="memberSearch" placeholder="اكتب اسم العنصر..." oninput="renderMembers()"></label>
 <div class="table-wrap" id="membersTable"></div>
 <div class="toolbar"><button class="secondary" onclick="exportMembers()">تصدير العناصر</button></div>
@@ -555,6 +556,7 @@ b.classList.toggle("hidden",hide);
 document.getElementById("addTeamBtn").classList.toggle("hidden",!isOwner());
 document.getElementById("renameTeamBtn").classList.toggle("hidden",!isOwner());
 document.getElementById("generalAddBtn").classList.toggle("hidden",isCulture());
+document.getElementById("bulkAddBtn").classList.toggle("hidden",isCulture());
 document.querySelectorAll(".owner-only").forEach(e=>e.classList.toggle("hidden",!isOwner()));
 }
 function startListeners(){
@@ -985,6 +987,31 @@ let uniform=document.getElementById("teamNewMemberUniform").value;
 if(!n){alert("اكتب اسم العنصر.");return}
 data.members.push({id:uid(),name:n,phone:p,birthDate:birth,uniform,teamId:selectedTeam.id,teamName:selectedTeam.name,groupId:"",transferHistory:[]});
 saveData();document.getElementById("teamMemberForm").classList.add("hidden");renderTeamDetails();
+}
+function showBulkForm(){
+const ts=vt().filter(t=>canEdit(t.id));
+const f=document.getElementById("bulkForm");
+if(!ts.length){alert("ما عندك صلاحية.");return}
+f.classList.remove("hidden");
+f.innerHTML=`<h3>إضافة عناصر بالأرقام</h3>
+<div class="notice">اكتب لكل فرقة عدد العناصر. بيتسجّلوا بأسماء أرقام (1، 2، 3...) وبتكمل بعد آخر رقم موجود. بعدين بتغيّر الأرقام لأسماء حقيقية من زر "تعديل". اترك الخانة فاضية أو 0 للفرقة اللي ما بدك تضيف عليها.</div>
+${ts.map(t=>`<label>${esc(t.name)} (الحالي: ${data.members.filter(m=>m.teamId===t.id).length})<input type="number" min="0" max="300" inputmode="numeric" id="bulk_${t.id}" placeholder="0"></label>`).join("")}
+<div class="toolbar"><button class="action" onclick="saveBulk()">إضافة</button><button class="secondary" onclick="document.getElementById('bulkForm').classList.add('hidden')">إلغاء</button></div>`;
+}
+function saveBulk(){
+const ts=vt().filter(t=>canEdit(t.id));
+const plan=[];let total=0;
+ts.forEach(t=>{const n=parseInt(document.getElementById("bulk_"+t.id).value,10);if(n>0){plan.push([t,Math.min(n,300)]);total+=Math.min(n,300)}});
+if(!total){alert("اكتب عدداً لفرقة وحدة على الأقل.");return}
+if(!confirm("رح تنضاف "+total+" عنصر ("+plan.map(([t,n])=>t.name.replace("فرقة ","")+": "+n).join("، ")+"). متابعة؟"))return;
+plan.forEach(([t,n])=>{
+let start=0;
+data.members.filter(m=>m.teamId===t.id&&/^\d+$/.test(m.name)).forEach(m=>{start=Math.max(start,parseInt(m.name,10))});
+for(let i=1;i<=n;i++)data.members.push({id:uid()+"b"+i,name:String(start+i),phone:"",birthDate:"",uniform:"",teamId:t.id,teamName:t.name,groupId:"",transferHistory:[]});
+});
+saveData();renderMembers();
+document.getElementById("bulkForm").classList.add("hidden");
+alert("تمت إضافة "+total+" عنصر.");
 }
 function showGeneralMemberForm(){
 let f=document.getElementById("generalMemberForm");
